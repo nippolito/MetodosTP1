@@ -1,0 +1,49 @@
+¿Qué hay que implementar?
+
+- Matriz rala (o sea, con muchos ceros) que sea eficiente en espacio
+- Estructura de esa matriz que pueda hacer las siguientes operaciones de forma eficiente en tiempo:
+	> Multiplicación de matrices (para el cálculo de ((I - pWD)x) ) ******
+	> Multiplicación de matriz por un escalar (para el cálculo de ((I - pWD)x) ) ******
+	> Resta de matrices (para el cálculo de ((I - pWD)x) ) ******
+	> Eliminación Gausseana
+	> Obtener el grado de una página???
+
+****** Si no sabés qué es la ecuación (I - pWD)x) lee el enunciado viejoooooo
+
+Teniendo esto en cuenta... qué matriz rala implementamos? Diferentes alternativas que veo:
+
+──────────────────────────────────────────────────────────────────────────────────────
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+──────────────────────────────────────────────────────────────────────────────────────
+
+<<<Matriz de adyacencia>>>
+
+Completamente descartada creo yo... Pese a que haría algunos algoritmos más fáciles y quizás más veloces temporalmente,
+sería absolutamente ineficiente en espacio.
+
+<<<Lista de adyacencia indicando elemento y la columna en la que se encuentra (sería vector<vector<pair(elemento, columna)> >) >>>
+
+Mucho más eficiente en espacio. La pregunta acá es: ordenamos cada fila por columnas? (o sea, que el primer elemento que aparezca
+en cada fila sea el que tiene la columna más cercana al 0, y luego se mantenga este orden ascendente en cuanto a columnas).
+¿Esto nos facilitaría los algoritmos y nos bajaría el costo temporal de las funciones más importantes o no? Creo que el principal
+dilema de qué estructura utilizar viene por acá (si ordenamos o no ordenamos cada fila), aparte discutir por qué la ordenamos (o no),
+claramente va a ser una buena sección del informe y debemos justificarlo bastante. También habría que ver si utilizamos vectores o listas enlazadas.
+
+Estuve haciendo en papel ejemplos de las operaciones que tenemos que hacer de forma eficiente en tiempo con ambas estructuras (ordenando o no haciéndolo)
+para ir pispeando las diferencias. Me faltó ver eliminación gausseana, pero viendo lo que serían los algoritmos de las otras operaciones me quedo con
+ordenar cada fila por columnas y utilizar listas enlazadas en lugar de vectores (esto porque te permite insertarOrdenado en O(log(#elementosFila)) y 
+el vector tiene una operación para insertar en el medio pero es lineal con respecto a la cantidad de elementos que quedan por delante). Me da muchísima
+paja igual el utilizar listas enlazadas, pero ya fue, para mí le mandamos igual (aparte seguro hay un tipo list en c++ que nos facilite la vida).
+
+Estaría bueno que vayan pensando en todas estas cosas.
+
+
+PARA PETER: Anoche, no se si recordás, hablamos de que vos querías hacer algo antes de irte mañana (por cierto, pasala 10 puntos loco!), y yo te hablé de 
+demostrar formalmente lo siguiente (que es parte del enunciado): "¿Por qué la matriz A definida en (4) es equivalente a p W D + e z T ? Justificar adecua-
+damente." Si querés hacer algo antes de irte, esa sería una buena opción. Yo ayer lo estuve viendo informalmente en una hoja y pude ver bien por qué son iguales, 
+pero confío en que vos vas a poder verlo mucho más formalmente que yo.
+
+
+
+
+
