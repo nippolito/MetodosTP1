@@ -63,14 +63,15 @@ int buscarColumnaEnFila(vector<pair<float, int> >& vec, int j){
 	bool encontrado = false;
 	int res = -1;
 
-	if(vec.size() == 0) return -1;
+	if(vec.size() == 0) {
+		cout << "EL SIZE ES CERO" << endl;
+		return -1;};
 
 	if(vec[desde].second > j || vec[hasta].second < j){return res;}
 
 	while(!encontrado){
-	
-		if(vec[hasta].second == j){res == hasta; encontrado = true;} 
-		if(vec[desde].second == j){res == desde; encontrado = true;}
+		if(vec[hasta].second == j){res = hasta; encontrado = true;} 
+		if(vec[desde].second == j){res = desde; encontrado = true;}
 
 		if((hasta - desde) == 1 ){
 			encontrado = true;
