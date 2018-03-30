@@ -43,8 +43,6 @@ void mostrarVectorPair(vector<pair<float, int > >& vec){
 	}else{
 		cout << "[]" << endl;
 	}
-
-
 }
 
 void mostrarRala(Rala* matriz){
@@ -64,6 +62,8 @@ int buscarColumnaEnFila(vector<pair<float, int> >& vec, int j){
 	int pivote;
 	bool encontrado = false;
 	int res = -1;
+
+	if(vec.size() == 0) return -1;
 
 	if(vec[desde].second > j || vec[hasta].second < j){return res;}
 
@@ -173,6 +173,8 @@ int gradoPag(struct Rala* A, int j){
 
 // suma las matrices A y B y devuelve la suma en C
 void sumaMatricial(Rala* A, Rala* B, Rala* C){
+	mostrarRala(A);
+	mostrarRala(B);
 	int n = A->n;
 	crearRala(C, n);
 	for(int i = 0; i < n; i++){
@@ -180,7 +182,7 @@ void sumaMatricial(Rala* A, Rala* B, Rala* C){
 		vector<pair<float, int> > filB = B->conex[i];
 		int indA = 0;
 		int indB = 0;
-		while(indA < n && indB < n){
+		while(indA < filA.size() && indB < filB.size()){
 			pair<float, int> parA = filA[indA];
 			pair<float, int> parB = filB[indB];
 			if(parA.second == parB.second){
@@ -198,14 +200,14 @@ void sumaMatricial(Rala* A, Rala* B, Rala* C){
 				indB++;
 			}
 		}
-		if(indA < n){
-			for(int j = indA; j < n; j++){
+		if(indA < filA.size()){
+			for(int j = indA; j < filA.size(); j++){
 				pair<float, int> ppA = filA[indA];
 				insertarElemento(C, i, ppA.second, ppA.first);
 			}
 		}
-		if(indB < n){
-			for(int j = indB; j < n; j++){
+		if(indB < filB.size()){
+			for(int j = indB; j < filB.size(); j++){
 				pair<float, int> ppB = filB[indB];
 				insertarElemento(C, i, ppB.second, ppB.first);
 			}
@@ -213,107 +215,108 @@ void sumaMatricial(Rala* A, Rala* B, Rala* C){
 	}
 }
 
+// ojo que la dejé llena de couts, no estoy seguro si es el código ya que el buscarColumnaEnFila está fallando
 void multiplicacionMatricial(Rala* A, Rala* B, Rala* C){
 	int n = A->n;
 	crearRala(C, n);
 	for(int i = 0; i < n * n; i++){
-		vector<pair<float, int> > filC = A->conex[(i / n)];
+		// i/n es la fila en la que tiene que ir el elem en C
+		// i%n es la columna en la que tiene que ir el elem en C
+		vector<pair<float, int> > filA = A->conex[(i / n)];
 		int colC = i % n; // columnas van de 0 a n-1
 		float acum = 0;
-		for(int j = 0; j < filC.size(); j++){
-			float valAct = filC[j].first; // es el valor de A que tengo que multiplicar por uno de B
-			int colAct = filC[j].second; // la fila de B en la que se tiene que encontrar el elemento a multiplicar por el de A
+		for(int j = 0; j < filA.size(); j++){
+			float valAct = filA[j].first; // es el valor de A que tengo que multiplicar por uno de B
+			int colAct = filA[j].second; // la fila de B en la que se tiene que encontrar el elemento a multiplicar por el de A
 			vector<pair<float, int> > filaRevisar = B->conex[colAct];
 			int k = buscarColumnaEnFila(filaRevisar, colC);
+			cout << "fila: " << colAct << endl;
+			cout << "col: " << colC << endl;
+			cout << k << endl;
 			if(k != -1){ // si en la fila correspondiente de B, la columna que busco tenía un elem
 				acum = acum + (valAct * filaRevisar[k].first);
 			}
 		}
 		if(acum != 0){ // si la multiplicación no dio 0, entonces agrego el elem a C
-			insertarElemento(C, i/n, i%n + 1, acum);
+			insertarElemento(C, i/n, colC, acum);
+		}
+	}
+}
+
+void multiplicacionPorEscalar(Rala* A, float valor ){
+	for (int i = 0; i < A->conex.size(); ++i)
+	{
+		for (int j = 0; j < A->conex[i].size(); ++j)
+		{
+			A->conex[i][j].first = A->conex[i][j].first * valor;   
 		}
 	}
 }
 
 
 
-void Test1ParaSuma(){
-	Rala* A;
-	crearRala(A, 3);
-	vector<vector<pair<float, int> > > matA = A->conex;
+void Test1ParaSuma(){ 	// pasa, todo OK
+	Rala A;
+	crearRala(&A, 3);
 
-	Rala* B;
-	crearRala(B, 3);
-	vector<vector<pair<float, int> > > matB = B->conex;
+	Rala B;
+	crearRala(&B, 3);
 
-	matA[0].push_back(make_pair(4, 0));
-	matA[0].push_back(make_pair(2, 2));
-	matA[1].push_back(make_pair(1, 2));
-	matA[2].push_back(make_pair(2, 1));
-	matB[0].push_back(make_pair(5, 2));
-	matB[1].push_back(make_pair(3, 0));
-	matB[1].push_back(make_pair(2, 1));
-	matB[2].push_back(make_pair(3, 2));
+	insertarElemento(&A, 0, 0, 4);
+	insertarElemento(&A, 0, 2, 2);
+	insertarElemento(&A, 1, 2, 1);
+	insertarElemento(&A, 2, 1, 2);
+	insertarElemento(&B, 0, 2, 5);
+	insertarElemento(&B, 1, 0, 3);
+	insertarElemento(&B, 1, 1, 2);
+	insertarElemento(&B, 2, 2, 3);
 
-	Rala* C;
-	sumaMatricial(A, B, C);
-	mostrarRala(C);
+	Rala C;
+	sumaMatricial(&A, &B, &C);
+	mostrarRala(&C);
 }
 
 void Test1ParaMult(){
-	Rala* A;
-	crearRala(A, 3);
-	vector<vector<pair<float, int> > > matA = A->conex;
+	Rala A;
+	crearRala(&A, 3);
 
-	Rala* B;
-	crearRala(B, 3);
-	vector<vector<pair<float, int> > > matB = B->conex;
+	Rala B;
+	crearRala(&B, 3);
 
-	matA[0].push_back(make_pair(3, 2));
-	matA[1].push_back(make_pair(2, 0));
-	matA[1].push_back(make_pair(1, 1));
-	matA[2].push_back(make_pair(2, 1));
-	matB[0].push_back(make_pair(4, 0));
-	matB[0].push_back(make_pair(2, 1));
-	matB[1].push_back(make_pair(1, 2));
-	matB[2].push_back(make_pair(1, 0));
-	matB[2].push_back(make_pair(3, 2));
+	insertarElemento(&A, 0, 2, 3);
+	insertarElemento(&A, 1, 0, 2);
+	insertarElemento(&A, 1, 1, 1);
+	insertarElemento(&A, 2, 1, 2);
+	insertarElemento(&B, 0, 0, 4);
+	insertarElemento(&B, 0, 1, 2);
+	insertarElemento(&B, 1, 2, 1);
+	insertarElemento(&B, 2, 0, 1);
+	insertarElemento(&B, 2, 2, 3);
 
-	Rala* C;
-	sumaMatricial(A, B, C);
-	mostrarRala(C);	
+	mostrarRala(&A);
+	mostrarRala(&B);
+
+	Rala C;
+	multiplicacionMatricial(&A, &B, &C);
+	cout << endl;
+	mostrarRala(&C);	
 }
 
 
 int main(){
-	Rala A;
-	crearRala(&A, 3);
+	// Test1ParaSuma();
 	// vector<vector<pair<float, int> > > matA = (&A)->conex;
 
 	// Rala* B;
 	// crearRala(&B, 3);
 	// vector<vector<pair<float, int> > > matB = B->conex;
 
-	insertarElemento(&A, 0, 2, 3);
-	insertarElemento(&A, 1, 0, 2);
-	insertarElemento(&A, 1, 1, 1);
-	insertarElemento(&A, 2, 1, 2);
+	// Test1ParaMult();
+	vector<pair<float, int> > p;
+	p.push_back(make_pair(1,0));
+	p.push_back(make_pair(3,2));
+	cout << buscarColumnaEnFila(p, 2) << endl; // está devolviendo -1
 
-	mostrarRala(&A);
-
-	// matA[0].push_back(make_pair(3, 2));
-	// matA[1].push_back(make_pair(2, 0));
-	// matA[1].push_back(make_pair(1, 1));
-	// matA[2].push_back(make_pair(2, 1));
-
-
-
-
-	// matB[0].push_back(make_pair(4, 0));
-	// matB[0].push_back(make_pair(2, 1));
-	// matB[1].push_back(make_pair(1, 2));
-	// matB[2].push_back(make_pair(1, 0));
-	// matB[2].push_back(make_pair(3, 2));
 
 
 	return 0;
