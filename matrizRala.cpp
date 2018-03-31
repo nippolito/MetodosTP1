@@ -13,8 +13,7 @@ struct Rala{
 	// pair.first = elemento, pair.second = columna
 };
 
-// Cabe aclarar que la struct puede cambiar, por eso me frené en la implementación hasta que definamos bien.
-// Sólo dejé acá un par de funciones boludas
+// IMPORTANTE: Cada fila está ordenada por columnas (o sea, por el segundo elemento de los pairs)
 
 void crearRala(struct Rala* matriz, int n){
 	matriz->n = n;
@@ -55,6 +54,7 @@ void mostrarRala(Rala* matriz){
 //Si no se encuentra el elemento, devuelve el indice -1
 //ver que NO puede haber repetidos (no puede haber varias columnas "2")
 //Considerar que tome como parametro un puntero al vector para evitar copiar toda la estructura.
+// testeada y pareciera OK
 int buscarColumnaEnFila(vector<pair<float, int> >& vec, int j){ 
 
 	int desde = 0;
@@ -103,6 +103,7 @@ int buscarColumnaEnFila(vector<pair<float, int> >& vec, int j){
 	return res;
 }
 
+// testeada y pareciera OK
 int buscarPosicionParaAgregarOrdenado(vector<pair<float, int> >& vec, int j){
 
 
@@ -145,6 +146,7 @@ int buscarPosicionParaAgregarOrdenado(vector<pair<float, int> >& vec, int j){
 	return res;
 }
 
+// testeada y pareciera OK
 void insertarElemento(Rala* A, int fila, int columna, float valor ){
 
 	if(A->conex[fila].size() == 0){
@@ -160,6 +162,7 @@ void insertarElemento(Rala* A, int fila, int columna, float valor ){
 
 // devuelve el grado de la página j (o sea, la cantidad de elems en la columna j, o #linksSalientes)
 // es O((#conexiones)logn)
+// no está testeada
 int gradoPag(struct Rala* A, int j){
 	int res = 0;
 	int n = A->n;
@@ -173,6 +176,7 @@ int gradoPag(struct Rala* A, int j){
 }
 
 // suma las matrices A y B y devuelve la suma en C
+// funcionó piola con un ejemplo, habría que probar más casos bordes
 void sumaMatricial(Rala* A, Rala* B, Rala* C){
 	mostrarRala(A);
 	mostrarRala(B);
@@ -216,7 +220,8 @@ void sumaMatricial(Rala* A, Rala* B, Rala* C){
 	}
 }
 
-// ojo que la dejé llena de couts, no estoy seguro si es el código ya que el buscarColumnaEnFila está fallando
+// multiplica las matrices A y B, y devuelve el resultado en C
+// funcionó piola con un ejemplo, habría que probar más casos bordes
 void multiplicacionMatricial(Rala* A, Rala* B, Rala* C){
 	int n = A->n;
 	crearRala(C, n);
@@ -231,9 +236,9 @@ void multiplicacionMatricial(Rala* A, Rala* B, Rala* C){
 			int colAct = filA[j].second; // la fila de B en la que se tiene que encontrar el elemento a multiplicar por el de A
 			vector<pair<float, int> > filaRevisar = B->conex[colAct];
 			int k = buscarColumnaEnFila(filaRevisar, colC);
-			cout << "fila: " << colAct << endl;
-			cout << "col: " << colC << endl;
-			cout << k << endl;
+			// cout << "fila: " << colAct << endl;
+			// cout << "col: " << colC << endl;
+			// cout << k << endl;
 			if(k != -1){ // si en la fila correspondiente de B, la columna que busco tenía un elem
 				acum = acum + (valAct * filaRevisar[k].first);
 			}
@@ -244,6 +249,7 @@ void multiplicacionMatricial(Rala* A, Rala* B, Rala* C){
 	}
 }
 
+// funcionó piola con un ejemplo, habría que probar más casos bordes
 void multiplicacionPorEscalar(Rala* A, float valor ){
 	for (int i = 0; i < A->conex.size(); ++i)
 	{
@@ -255,8 +261,8 @@ void multiplicacionPorEscalar(Rala* A, float valor ){
 }
 
 
-
-void Test1ParaSuma(){ 	// pasa, todo OK
+// pasa, todo OK
+void Test1ParaSuma(){
 	Rala A;
 	crearRala(&A, 3);
 
@@ -277,6 +283,7 @@ void Test1ParaSuma(){ 	// pasa, todo OK
 	mostrarRala(&C);
 }
 
+// pasa, todo OK
 void Test1ParaMult(){
 	Rala A;
 	crearRala(&A, 3);
@@ -288,7 +295,7 @@ void Test1ParaMult(){
 	insertarElemento(&A, 1, 0, 2);
 	insertarElemento(&A, 1, 1, 1);
 	insertarElemento(&A, 2, 1, 2);
-	insertarElemento(&B, 0, 0, 4);
+	insertarElemento(&B, 0, 0, 1);
 	insertarElemento(&B, 0, 1, 2);
 	insertarElemento(&B, 1, 2, 1);
 	insertarElemento(&B, 2, 0, 1);
@@ -306,19 +313,7 @@ void Test1ParaMult(){
 
 int main(){
 	// Test1ParaSuma();
-	// vector<vector<pair<float, int> > > matA = (&A)->conex;
-
-	// Rala* B;
-	// crearRala(&B, 3);
-	// vector<vector<pair<float, int> > > matB = B->conex;
-
 	// Test1ParaMult();
-	vector<pair<float, int> > p;
-	p.push_back(make_pair(1,0));
-	p.push_back(make_pair(3,2));
-	cout << buscarColumnaEnFila(p, 2) << endl; // está devolviendo -1
-
-
 
 	return 0;
 }

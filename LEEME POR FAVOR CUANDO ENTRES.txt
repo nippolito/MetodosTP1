@@ -1,3 +1,6 @@
+***********Esto ya no es tan importante, ya decidimos qué estructura usar**********
+
+
 ¿Qué hay que implementar?
 
 - Matriz rala (o sea, con muchos ceros) que sea eficiente en espacio
