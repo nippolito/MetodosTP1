@@ -26,13 +26,23 @@ void crearRala(struct Rala* matriz, int n){
 
 void mostrarVectorPair(vector<pair<float, int > >& vec){
 	// cout << "longitud de vec: " << vec.size() << endl;
-	cout << "[";
-	int n = vec.size();
-	for(int i = 0 ; i < n ; i ++){
-		string comaOrEnd = i == n-1 ? "" : ", ";  
-		cout << "(" << vec[i].first << "," << vec[i].second << ")" << comaOrEnd;
+
+	if(vec.size() != 0){
+		if(vec.size() == 1){
+			cout << "[(" << vec[0].first << "," << vec[0].second << ")]" << endl;
+		}else{
+			cout << "[(" << vec[0].first << "," << vec[0].second << "), ";	
+		}
+		for(int i = 1; i < vec.size(); i++){
+			if(i < vec.size() - 1){
+				cout << "(" << vec[i].first << "," << vec[i].second << "), ";
+			}else{
+				cout << "(" << vec[i].first << "," << vec[i].second << ")]" << endl;
+			}
+		}
+	}else{
+		cout << "[]" << endl;
 	}
-	cout << "]" << endl;
 }
 
 void mostrarRala(Rala* matriz){
@@ -93,7 +103,7 @@ int buscarColumnaEnFila(vector<pair<float, int> >& vec, int j){
 	return res;
 }
 
-int buscarPosicionParaAgregarOrdenado(vector<pair<float, int> >& vec, int  columna){
+int buscarPosicionParaAgregarOrdenado(vector<pair<float, int> >& vec, int j){
 
 
 	int desde = 0;
@@ -102,12 +112,12 @@ int buscarPosicionParaAgregarOrdenado(vector<pair<float, int> >& vec, int  colum
 	bool encontrado = false;
 	int res = -1;
 
-	if(vec[desde].second >  columna){return 0;}
-	if(vec[hasta].second <  columna){return hasta+1;}
+	if(vec[desde].second > j){return 0;}
+	if(vec[hasta].second < j){return hasta+1;}
 	while(!encontrado){
 	
-		if(vec[hasta].second ==  columna){encontrado = true;} 
-		if(vec[desde].second ==  columna){encontrado = true;}
+		if(vec[hasta].second == j){encontrado = true;} 
+		if(vec[desde].second == j){encontrado = true;}
 
 		if((hasta - desde) == 1 ){
 			encontrado = true;
@@ -116,15 +126,15 @@ int buscarPosicionParaAgregarOrdenado(vector<pair<float, int> >& vec, int  colum
 
 		pivote = (hasta + desde)/2;
 
-		if(vec[pivote].second ==  columna){
+		if(vec[pivote].second == j){
 			encontrado = true;
 
 		} else {
 
-			if(vec[pivote].second< columna){
+			if(vec[pivote].second<j){
 				desde = pivote;
 			}
-			if(vec[pivote].second> columna){
+			if(vec[pivote].second>j){
 				hasta = pivote;
 			}
 
@@ -141,12 +151,10 @@ void insertarElemento(Rala* A, int fila, int columna, float valor ){
 		A->conex[fila].push_back(make_pair(valor, columna));
 	}else{
 		int i = buscarPosicionParaAgregarOrdenado(A->conex[fila], columna);
-		if(i == A->conex[fila].size()){ 
-			A->conex[fila].push_back(make_pair(valor, columna));
-		}
-		else {
-			A->conex[fila].insert(A->conex[fila].begin()+i, make_pair(valor, columna));
-		}
+		if(i == A->conex[fila].size()){ A->conex[fila].push_back(make_pair(valor, columna));}
+			else {
+				A->conex[fila].insert(A->conex[fila].begin()+i, make_pair(valor, columna));
+			}
 	}
 }
 
