@@ -94,17 +94,18 @@ void sumaMatricial(Rala* A, Rala* B, Rala* C){
 		map<int, double>::iterator itA = filA->begin();
 		map<int, double>::iterator itB = filB->begin();
 		
-		while(itA != filA->end() && itB != filB->end()){
-			if(itB == filB->end() ||  itA -> first < itB -> first){
+
+		while(itA != filA->end() || itB != filB->end()){
+			if( itB == filB->end()  ||  ((itA -> first < itB -> first) && itA != filA->end()) ){
 				insertarElemento(C, i, itA->first, itA->second);
 				itA ++;
 			}
-			else if( itA == filA->end() || itA -> first > itB -> first){
+			else if( itA == filA->end() || ((itA -> first > itB -> first) &&  itB != filB->end()) ){
 				insertarElemento(C, i, itB->first, itB->second);
 				itB ++;
 			}
 			else{
-				insertarElemento(C, i, itA->first, itB->second + itB -> second);
+				insertarElemento(C, i, itA->first, itA->second + itB -> second);
 				itA ++;
 				itB ++;
 			}
@@ -158,13 +159,17 @@ void Test1ParaSuma(){ 	// pasa, todo OK
 	insertarElemento(&A, 0, 2, 2);
 	insertarElemento(&A, 1, 2, 1);
 	insertarElemento(&A, 2, 1, 2);
+
 	insertarElemento(&B, 0, 2, 5);
 	insertarElemento(&B, 1, 0, 3);
 	insertarElemento(&B, 1, 1, 2);
 	insertarElemento(&B, 2, 2, 3);
 
 	Rala C = Rala(A.n);
+	cout << "MATRIZ RESULTADO VACIA: " << endl;
+	mostrarRala(&C);
 	sumaMatricial(&A, &B, &C);
+	cout << "MATRIZ FINAL:" << endl;
 	mostrarRala(&C);
 }
 
@@ -194,17 +199,18 @@ void Test1ParaMult(){
 
 
 int main(){
-	// Test1ParaSuma();
-	// vector<vector<pair<double, int> > > matA = (&A)->conex;
+	Test1ParaSuma();
+	//vector<vector<pair<double, int> > > matA = (&A)->conex;
 
 	// Rala* B;
 	// crearRala(&B, 3);
 	// vector<vector<pair<double, int> > > matB = B->conex;
 
 	// Test1ParaMult();
-	vector<pair<double, int> > p;
-	p.push_back(make_pair(1,0));
-	p.push_back(make_pair(3,2));
+	
+	//vector<pair<double, int> > p;
+	//p.push_back(make_pair(1,0));
+	//p.push_back(make_pair(3,2));
 
 
 
