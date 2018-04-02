@@ -100,7 +100,7 @@ void sumaMatricial(Rala* A, Rala* B, Rala* C){
 				insertarElemento(C, i, itA->first, itA->second);
 				itA ++;
 			}
-			else if( itA == filA->end() || ((itA -> first > itB -> first) &&  itB != filB->end()) ){
+			else if( itA == filA->end() || ((itA -> first > itB -> first) && itB != filB->end()) ){
 				insertarElemento(C, i, itB->first, itB->second);
 				itB ++;
 			}
@@ -115,17 +115,18 @@ void sumaMatricial(Rala* A, Rala* B, Rala* C){
 
 double multiplicarFilas(map<int,double>* filA, map<int,double>* colB, int n){
 	double ac = 0;
-	for(int i = 0 ; i < n ; i ++){
-		map<int,double>::iterator itA = filA->find(i);
-		map<int,double>::iterator itB = colB->find(i);
-		if( itA != filA->end() && itB != colB->end()){
-			ac += itA->second * itB->second;
+	map<int, double>::iterator itA = filA->begin();
+	while(itA != filA->end()){
+		map<int, double>::iterator itElemB = colB->find(itA->first);
+		if(itElemB != colB->end()){
+			ac += itA->second * itElemB->second;
 		}
+		itA++;
 	}
 	return ac;
 }
 
-// ojo que la dejé llena de couts, no estoy seguro si es el código ya que el buscarColumnaEnFila está fallando
+// multiplica las matrices A y B y devuelve la multiplicación en C
 void multiplicacionMatricial(Rala* A, Rala* B, Rala* C){
 	int n = A->n;
 	for(int i = 0; i < n; i++){
@@ -141,6 +142,7 @@ void multiplicacionMatricial(Rala* A, Rala* B, Rala* C){
 	}
 }
 
+// modifica A
 void multiplicacionPorEscalar(Rala* A, double valor ){
 	for (int i = 0; i < A->conex.size(); i++){
 		for(map<int,double>::iterator it = (A -> conex[i])->begin(); it != (A -> conex[i])->end(); it++){
@@ -173,7 +175,7 @@ void Test1ParaSuma(){ 	// pasa, todo OK
 	mostrarRala(&C);
 }
 
-void Test1ParaMult(){
+void Test1ParaMult(){ 	// pasa, todo OK
 	Rala A = Rala(3);
 
 	Rala B = Rala(3);
@@ -197,22 +199,29 @@ void Test1ParaMult(){
 	mostrarRala(&C);	
 }
 
+void Test1ParaMultPorEsc(){ 	// pasa, todo OK
+	Rala A = Rala(3);
+
+	insertarElemento(&A, 0, 2, 3);
+	insertarElemento(&A, 1, 0, 2);
+	insertarElemento(&A, 1, 1, 1);
+	insertarElemento(&A, 2, 1, 2);
+
+	cout << endl;
+	mostrarRala(&A);
+
+	double valor = 2.7378;
+	multiplicacionPorEscalar(&A, valor);
+
+	cout << endl;
+	mostrarRala(&A);	
+}
+
 
 int main(){
 	Test1ParaSuma();
-	//vector<vector<pair<double, int> > > matA = (&A)->conex;
-
-	// Rala* B;
-	// crearRala(&B, 3);
-	// vector<vector<pair<double, int> > > matB = B->conex;
-
-	// Test1ParaMult();
-	
-	//vector<pair<double, int> > p;
-	//p.push_back(make_pair(1,0));
-	//p.push_back(make_pair(3,2));
-
-
+	Test1ParaMult();
+	Test1ParaMultPorEsc();
 
 	return 0;
 }
