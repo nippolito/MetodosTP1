@@ -4,6 +4,7 @@
 #include <vector>
 #include <utility> // para pair
 #include <map>
+#include <cmath> 
 
 
 using namespace std;
@@ -144,6 +145,77 @@ void multiplicacionPorEscalar(Rala* A, double valor ){
 	for (int i = 0; i < A->conex.size(); i++){
 		for(map<int,double>::iterator it = (A -> conex[i])->begin(); it != (A -> conex[i])->end(); it++){
 			it -> second *= valor;
+		}
+	}
+}
+
+int maxIndexInMapFromKey(map<int,double>* m, int fila, int n ){
+	double max = 0;
+	for(int i = fila, i < n; i++){
+		map<int,double>::iterator it =  m->find(i);
+		if( it != m->end()){
+			if(abs(it->second) > abs(max)){
+					max = i;			
+			}
+		}
+	}
+	if(max == 0){
+		return -1;
+	}
+	return max;
+}
+
+int firstIndexWithValueDifferentThatZeroFrom(map<int,double>* m, int i, int n){
+	for(int j = i ; j < n ; j ++){
+		if(m->find(j) != m->end()) return j;
+	}
+	return -1;
+}
+
+void elimincacionGaussiana(Rala* A){
+	for(int i = 0  ; i < A->n ; i ++){
+		int filaMax = maxIndexInMapFromKey(A->transp[i], i), A->n;
+		if(filaMax != -1){
+//--------------------  Reacomodar posiciones.
+
+			map<int,double> * mapTemp = A->conex[i];
+			A -> conex[i] = A -> conex[filaMax];
+			A -> conex[i] = mapTemp;
+
+
+			map<int,double>* itI = A -> transp[i]->find(i);
+			map<int,double>* itM = A -> transp[i]->find(filaMax);
+
+			double dI = 0 ;
+			double dM = 0 ;
+
+			if(itI != A -> end()){
+				dI = itI -> second;
+				m->erase(itI);
+			}
+			if(itM != A -> end()){
+				dM = itM -> second;
+				m->erase(itM);
+			}
+
+			if(dI != 0 ){
+				m->insert(pair<int,double>(i,dM));
+			}
+			if(dM != 0 ){
+				m->insert(pair<int,double>(i,dI));
+			}
+
+//-------------------- 	transformar los ceros	
+			int dz = firstIndexWithValueDifferentThatZeroFrom(m, i+1, A->n);
+			if(dz == -1) break;
+			for(map<int,double>::iterator it = m->find(dz); it != m->end(); it++){
+				it->second =  
+			}
+			
+
+
+
+
 		}
 	}
 }
