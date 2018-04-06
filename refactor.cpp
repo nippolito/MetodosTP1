@@ -44,21 +44,24 @@ public:
 };
 
 
-void mostrarVectorPair(map<int,double>* m){
+void mostrarVectorPair(map<int,double>* m, int n){
 	// cout << "longitud de vec: " << vec.size() << endl;
 	cout << "[";
-	for(map<int,double>::iterator it = m->begin(); it != m->end(); it++){
-		map<int,double>::iterator next = it;
-		next ++; 
-		string comaOrEnd = next == m->end() ? "" : ", ";  
-		cout << "(" << it->first << "," << it -> second << ")" << comaOrEnd;
+	for(int i =  0 ; i < n ; i ++){
+		map<int,double>::iterator it = m -> find(i);
+		string comaOrEnd = i == n-1 ? "" : ", "; 
+		if(it != m->end()){
+			cout <<  it -> second << comaOrEnd;
+		}else{
+			cout <<"0" << comaOrEnd;
+		}
 	}
 	cout << "]" << endl;
 }
 
 void mostrarRala(Rala* matriz){
 	for(int link = 0; link < matriz->n; link++){
-		mostrarVectorPair(matriz->conex[link]);
+		mostrarVectorPair(matriz->conex[link], matriz->n);
 	}
 }
 
@@ -152,20 +155,19 @@ void multiplicacionPorEscalar(Rala* A, double valor ){
 	}
 }
 
-int maxIndexInMapFromKey(map<int,double>* m, int fila, int n ){
-	double max = 0;
-	for(int i = fila, i < n; i++){
-		map<int,double>::iterator it =  m->find(i);
-		if( it != m->end()){
-			if(abs(it->second) > abs(max)){
-					max = i;			
+int maxIndexInMapFromKey(Rala* r, int col, int n ){
+	double maxIndex = -1;
+	double maxVal = 0;
+	for(int i = col; i < n; i++){
+		map<int,double>::iterator it =  r->conex[i]->find(col);
+		if( it != (r->conex[i])->end()){
+			if(abs(it->second) > abs(maxVal)){
+					maxVal = it->second;
+					maxIndex = i;			
 			}
 		}
 	}
-	if(max == 0){
-		return -1;
-	}
-	return max;
+	return maxIndex;
 }
 
 int firstIndexWithValueDifferentThatZeroFrom(map<int,double>* m, int i, int n){
@@ -175,50 +177,41 @@ int firstIndexWithValueDifferentThatZeroFrom(map<int,double>* m, int i, int n){
 	return -1;
 }
 
+void reduceRowFromPivot(map<int,double>* row, map<int,double>* pivot, int col, int n){
+	map<int,double>::iterator itPivot = pivot->find(col);
+	map<int,double>::iterator itRow = row->find(col);
+	double pivotBase = itPivot->second;
+	double rowBase = itRow->second;
+	double coeficiente = rowBase / pivotBase;
+	
+	for(map<int,double>::iterator it = itPivot; it != pivot -> end(); it ++){
+		itRow = row->find(it->first);
+		if(itRow != row -> end()){
+			itRow -> second = (itRow -> second) - coeficiente * (it -> second );
+		}else{
+			row -> insert(pair<int,double>(it->first, (it->second) * coeficiente));
+		}
+	}
+}
+
 void elimincacionGaussiana(Rala* A){
-	for(int i = 0  ; i < A->n ; i ++){
-		int filaMax = maxIndexInMapFromKey(A->transp[i], i), A->n;
+	int n = A -> n ;
+	for(int i = 0  ; i < n ; i ++){
+		int filaMax = maxIndexInMapFromKey(A, i, A->n);
 		if(filaMax != -1){
 //--------------------  Reacomodar posiciones.
-
-			map<int,double> * mapTemp = A->conex[i];
-			A -> conex[i] = A -> conex[filaMax];
-			A -> conex[i] = mapTemp;
-
-
-			map<int,double>* itI = A -> transp[i]->find(i);
-			map<int,double>* itM = A -> transp[i]->find(filaMax);
-
-			double dI = 0 ;
-			double dM = 0 ;
-
-			if(itI != A -> end()){
-				dI = itI -> second;
-				m->erase(itI);
-			}
-			if(itM != A -> end()){
-				dM = itM -> second;
-				m->erase(itM);
-			}
-
-			if(dI != 0 ){
-				m->insert(pair<int,double>(i,dM));
-			}
-			if(dM != 0 ){
-				m->insert(pair<int,double>(i,dI));
-			}
-
+			map<int,double> * mapTemp = (A->conex)[i];
+			(A->conex)[i] = (A->conex)[filaMax];
+			(A->conex)[filaMax] = mapTemp;
 //-------------------- 	transformar los ceros	
-			int dz = firstIndexWithValueDifferentThatZeroFrom(m, i+1, A->n);
-			if(dz == -1) break;
-			for(map<int,double>::iterator it = m->find(dz); it != m->end(); it++){
-				it->second =  
+			map<int,double>* pivot = A -> conex[i];
+
+			for(int j = i+1; j < A -> n ; j++){
+				map<int,double> * row = A -> conex[j];
+				if(row -> find(i) != row->end()){
+					reduceRowFromPivot(row,pivot, i ,n);
+				}
 			}
-			
-
-
-
-
 		}
 	}
 }
@@ -339,11 +332,34 @@ void Test1ParaMultPorEsc(){ 	// pasa, todo OK
 	mostrarRala(&A);	
 }
 
+void TestEliminacionGaussiana(){
+	Rala A = Rala(3);
+/*
+3 4 4
+0 2 4
+5 0 4
+*/
+	insertarElemento(&A, 0, 0, 3);
+	insertarElemento(&A, 0, 1, 4);
+	insertarElemento(&A, 0, 2, 4);
+
+	insertarElemento(&A, 1, 1, 2);
+	insertarElemento(&A, 1, 2, 4);
+
+	insertarElemento(&A, 2, 0, 5);
+	insertarElemento(&A, 2, 2, 4);
+
+
+	mostrarRala(&A);
+
+	elimincacionGaussiana(&A);
+
+	mostrarRala(&A);
+}
+
 
 int main(){
-
-	srand(time(NULL));
-	TestGeneradores(1, 0.0, 100.0);
+	TestEliminacionGaussiana();
 	//Test1ParaSuma();
 	//Test1ParaMultPorEsc();
 
