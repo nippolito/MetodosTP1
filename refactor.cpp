@@ -224,6 +224,56 @@ void elimincacionGaussiana(Rala* A){
 }
 
 
+
+//-------------------------------------------------------------GENERADORES
+
+//Genera una matriz aleatoria con varios paramtros:
+
+//proba: Es la probabilidad de agregar un elemento en cada columna. Tambien se puede ver como la DENSIDAD de una matriz.
+//		 Toma valores de 0 a 10. Si es 0, sera una matriz nula, y si es 10 tendra un valor distinto a 0 para cada Aij.
+//
+//Fmin y Fman es el rango de valores que pueden tomar los elementos de la matriz.
+
+int generarMatrizAleatoria(Rala* A, int proba, double fMin, double fMax){
+	int n = A->n;
+	int rangoProba = proba;
+	if(rangoProba > 10 || rangoProba < 0 || fMin > fMax ){return -1;}
+
+	if (rangoProba == 10){rangoProba = 9; }
+	
+	if(rangoProba != 0){
+
+		for (int fila = 0; fila < n; ++fila)
+		{
+			for (int columna = 0; columna < n; ++columna)
+			{
+				int prob = rand() % 10;
+				if(prob <= rangoProba){
+
+					double valor = (fMax - fMin) * ( (double)rand() / (double)RAND_MAX ) + fMin;
+					insertarElemento(A, fila, columna, valor );
+				}
+			}
+		}
+
+		return 1;
+	
+	} else {
+
+		return 1;
+	
+	}	
+
+}
+
+
+void TestGeneradores(int prob, int min, int max){
+	Rala A = Rala(5);
+	generarMatrizAleatoria(&A, prob, min, max);
+	mostrarRala(&A);
+
+}
+
 void Test1ParaSuma(){ 	// pasa, todo OK
 	Rala A = Rala(3);
 
@@ -291,9 +341,11 @@ void Test1ParaMultPorEsc(){ 	// pasa, todo OK
 
 
 int main(){
-	Test1ParaSuma();
-	Test1ParaMult();
-	Test1ParaMultPorEsc();
+
+	srand(time(NULL));
+	TestGeneradores(1, 0.0, 100.0);
+	//Test1ParaSuma();
+	//Test1ParaMultPorEsc();
 
 	return 0;
 }
