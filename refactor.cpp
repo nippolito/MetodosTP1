@@ -219,6 +219,8 @@ void elimincacionGaussiana(Rala* A){
 
 
 //-------------------------------------------------------------GENERADORES
+//TODOS LOS GENERADORES TOMAN UNA MATRIZ NULA COMO ENTRADA!
+
 
 //Genera una matriz aleatoria con varios paramtros:
 
@@ -226,6 +228,8 @@ void elimincacionGaussiana(Rala* A){
 //		 Toma valores de 0 a 10. Si es 0, sera una matriz nula, y si es 10 tendra un valor distinto a 0 para cada Aij.
 //
 //Fmin y Fman es el rango de valores que pueden tomar los elementos de la matriz.
+//Ver que si no es posible hacerse, devuelve un -1
+
 
 int generarMatrizAleatoria(Rala* A, int proba, double fMin, double fMax){
 	int n = A->n;
@@ -256,15 +260,86 @@ int generarMatrizAleatoria(Rala* A, int proba, double fMin, double fMax){
 		return 1;
 	
 	}	
-
 }
 
 
-void TestGeneradores(int prob, int min, int max){
-	Rala A = Rala(5);
-	generarMatrizAleatoria(&A, prob, min, max);
-	mostrarRala(&A);
+int generarMatrizConectividad(Rala* A, int proba){
+	int n = A->n;
+	int rangoProba = proba;
+	if(rangoProba > 10 || rangoProba < 0){return -1;}
+	
+	if(rangoProba != 0){
 
+		for (int fila = 0; fila < n; ++fila)
+		{
+			for (int columna = 0; columna < n; ++columna)
+			{
+				int prob = (rand() % 10)+1;
+				if(prob <= rangoProba){
+					insertarElemento(A, fila, columna, 1);
+				}
+			}
+		}
+
+		return 1;
+	
+	} else {
+
+		return 1;
+	
+	}	
+
+}
+
+int generarMatrizIdentidad(Rala* A){
+	int n = A->n;
+
+		for (int fila = 0; fila < n; ++fila)
+		{
+			insertarElemento(A, fila, fila, 1);
+		}
+
+		return 1;
+	
+}
+
+//A TIENE QUE SER MATRIZ NULA. W MATRIZ DE CONECTIVIDAD
+int generarMatrizDiagonalD(Rala* A, Rala* W){
+	if (A->n != W->n){ return -1;}
+	int n = W->n;
+
+		for (int fila = 0; fila < n; ++fila)
+		{
+			int grado = gradoSalida(W, fila);
+			if(grado != 0){
+				
+				double valor = 1.0/grado;
+				insertarElemento(A, fila, fila, valor);
+			}
+			
+		}
+
+		return 1;
+	
+}
+
+vector<int> generarVectorE(int n){
+	vector <int> result(n, 1);
+	return result;
+}
+
+
+
+
+
+
+//-------------------------------------------------------------GENERADORES
+
+
+
+void TestGeneradores(int prob){
+	
+	Rala A = Rala(5);
 }
 
 void Test1ParaSuma(){ 	// pasa, todo OK
@@ -359,7 +434,9 @@ void TestEliminacionGaussiana(){
 
 
 int main(){
-	TestEliminacionGaussiana();
+	srand(time(NULL));
+	TestGeneradores(7);
+	//TestEliminacionGaussiana();
 	//Test1ParaSuma();
 	//Test1ParaMultPorEsc();
 
