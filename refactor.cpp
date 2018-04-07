@@ -273,11 +273,13 @@ int generarMatrizConectividad(Rala* A, int proba){
 		for (int fila = 0; fila < n; ++fila)
 		{
 			for (int columna = 0; columna < n; ++columna)
-			{
-				int prob = (rand() % 10)+1;
-				if(prob <= rangoProba){
+			{	
+				if(fila != columna){
+					int prob = (rand() % 10)+1;
+					if(prob <= rangoProba){
 					insertarElemento(A, fila, columna, 1);
-				}
+					}	
+				}	
 			}
 		}
 
@@ -340,6 +342,8 @@ vector<int> generarVectorE(int n){
 void TestGeneradores(int prob){
 	
 	Rala A = Rala(5);
+	generarMatrizConectividad(&A, prob);
+	mostrarRala(&A);
 }
 
 void Test1ParaSuma(){ 	// pasa, todo OK
