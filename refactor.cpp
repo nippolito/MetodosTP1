@@ -15,21 +15,17 @@ public:
 		n = size;
 
 		vector< map<int, double>* > conecciones (n, NULL);
-		vector< map<int, double>* > transpuesta (n, NULL);
 
 		for(int i = 0 ; i < n ; i ++){
 			conecciones[i] = new map<int,double> ();
-			transpuesta[i] = new map<int,double> ();
 		}
 
 		conex = conecciones;
-		transp = transpuesta;
 	}
 
 	~Rala(){
 		for(int i = 0 ; i < n ; i ++){
 			delete(conex[i]);
-			delete(transp[i]);
 		}		
 	}
 
@@ -67,7 +63,6 @@ void mostrarRala(Rala* matriz){
 
 void insertarElemento(Rala* A, int fila, int columna, double valor ){
 	A -> conex[fila] -> insert(pair<int,double>(columna,valor));
-	A -> transp[columna] -> insert(pair<int,double>(fila,valor));
 }
 
 // devuelve el grado de la página j (o sea, la cantidad de elems en la columna j, o #linksSalientes)
@@ -117,6 +112,15 @@ void sumaMatricial(Rala* A, Rala* B, Rala* C){
 	}
 }
 
+void createTranspose(Rala* A, Rala* At){
+	int n = A -> n;
+	for(int i = 0; i < n ; i ++){
+		for(map<int,double>::iterator it = (A -> conex[i]) -> begin() ; it != (A -> conex[i]) -> end(); it ++){
+			insertarElemento(At, i, it->first, it -> second);
+		}
+	}
+}
+
 double multiplicarFilas(map<int,double>* filA, map<int,double>* colB, int n){
 	double ac = 0;
 	map<int, double>::iterator itA = filA->begin();
@@ -133,10 +137,12 @@ double multiplicarFilas(map<int,double>* filA, map<int,double>* colB, int n){
 // multiplica las matrices A y B y devuelve la multiplicación en C
 void multiplicacionMatricial(Rala* A, Rala* B, Rala* C){
 	int n = A->n;
+	Rala transp = Rala(n);
+	createTranspose(B, &transp);
 	for(int i = 0; i < n; i++){
 		for(int j = 0 ; j < n ; j ++){
 			map<int,double>* filA = A->conex[i];
-			map<int,double>* colB = B->transp[j];
+			map<int,double>* colB = transp.conex[j];
 
 			double multRes = multiplicarFilas(filA, colB, n);
 			if(multRes != 0 ){
@@ -228,10 +234,10 @@ void solveLinearEquations(Rala* A, double conjunta [], double res [], int n ){
 		for(int j = n-1 ; j > i ; j --){
 			map<int,double>::iterator it2  = (A -> conex[i]) -> find(j);
 			if(it2 != (A -> conex[i])->end() ){
-				ac - (res[j] * (it2 -> second));	
+				ac -= (res[j] * (it2 -> second));	
 			}
 		}
-		res[i] = ac / (A -> conex[i])->find(i);
+		res[i] = ac / (A -> conex[i])->find(i)->second;
 	} 
 }
 
