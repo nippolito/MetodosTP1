@@ -214,8 +214,26 @@ void elimincacionGaussiana(Rala* A){
 			}
 		}
 	}
+
+	// RECREAR LA TRANSPUESTA
 }
 
+//NO TIENE QUE TENER CEROS EN LA DIAGONAL
+
+void solveLinearEquations(Rala* A, double conjunta [], double res [], int n ){
+	elimincacionGaussiana(A);
+
+	for(int i = n-1; i >= 0 ; i --){
+		double ac = conjunta [i];
+		for(int j = n-1 ; j > i ; j --){
+			map<int,double>::iterator it2  = (A -> conex[i]) -> find(j);
+			if(it2 != (A -> conex[i])->end() ){
+				ac - (res[j] * (it2 -> second));	
+			}
+		}
+		res[i] = ac / (A -> conex[i])->find(i);
+	} 
+}
 
 
 //-------------------------------------------------------------GENERADORES
