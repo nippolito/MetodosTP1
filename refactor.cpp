@@ -40,7 +40,18 @@ public:
 };
 
 
-void mostrarVectorPair(map<int, double>* m, int n) {
+void mostrarVectorEnteros(vector<double> v ){
+	int n  = v.size();
+	cout << "[";
+	for(int i =  0 ; i < n ; i ++){
+		string comaOrEnd = i == n-1 ? "" : ", "; 
+		cout <<  v[i] << comaOrEnd;
+	}
+	cout << "]" << endl;
+}
+
+
+void mostrarVectorPair(map<int,double>* m, int n){
 	// cout << "longitud de vec: " << vec.size() << endl;
 	cout << "[";
 	for (int i = 0; i < n; i++) {
@@ -64,8 +75,23 @@ void mostrarRala(Rala* matriz) {
 }
 
 void insertarElemento(Rala* A, int fila, int columna, double valor ){
-	A -> conex[fila] -> insert(pair<int,double>(columna,valor));
+	
+	map<int,double>::iterator it = A -> conex[fila] -> find(columna);
+	if( it != A -> conex[fila] -> end() ){
+		it -> second = valor;
+	}else{
+		A -> conex[fila] -> insert(pair<int,double>(columna,valor));	
+	}
 }
+
+Rala CrearIdentidad(int n ){
+	Rala res = Rala(n);
+	for(int i = 0 ; i < n; i++){
+		insertarElemento(&res, i, i, 1 );
+	}
+	return res;
+}
+
 
 // devuelve el grado de la página j (o sea, la cantidad de elems en la columna j, o #linksSalientes)
 // es O((#conexiones)logn)
@@ -154,6 +180,25 @@ void multiplicacionMatricial(Rala* A, Rala* B, Rala* C) {
 	}
 }
 
+
+//modifica v ! 
+vector<double> multiplicarMatrizPorVector(Rala* A, vector<double>* v){
+	int n = A -> n ;
+	vector<double> res (n);
+	for(int i = 0; i < n; i ++){
+		map<int,double>* row = A ->conex[i];
+		double ac = 0 ;
+		for(map<int,double>::iterator it  = row->begin(); it != row->end(); it++){
+			ac += (it->second) * (*v)[it->first];
+		}
+		(*v)[i] = ac;
+	}
+	for(int i = 0 ; i < n ; i ++){
+		res[i] = (*v)[i];
+	}
+	return res;
+}
+
 // modifica A
 void multiplicacionPorEscalar(Rala* A, double valor) {
 	for (int i = 0; i < A->conex.size(); i++) {
@@ -188,10 +233,17 @@ int firstIndexWithValueDifferentThatZeroFrom(map<int, double>* m, int i, int n) 
 void reduceRowFromPivot(map<int, double>* row, map<int, double>* pivot, int col, int n) {
 	map<int, double>::iterator itPivot = pivot->find(col); //deberian ser lo mismo que it begin
 	map<int, double>::iterator itRow = row->find(col); //deberian ser lo mismo que it begin
+
+
+
+void reduceRowFromPivot(map<int,double>* row, map<int,double>* pivot, int fila, int col, int n, Rala* Linv){
+	map<int,double>::iterator itPivot = pivot->find(col);
+	map<int,double>::iterator itRow = row->find(col);
 	double pivotBase = itPivot->second;
 	double rowBase = itRow->second;
 	double coeficiente = rowBase / pivotBase;
 
+	insertarElemento(Linv, fila, col, coeficiente * -1);
 
 	for (map<int, double>::iterator it = itPivot; it != pivot->end(); it++) {
 		//lo cambio asi no hacemos una busqueda log n por cada elemento en el map Pivot
@@ -200,42 +252,82 @@ void reduceRowFromPivot(map<int, double>* row, map<int, double>* pivot, int col,
 		
 		//itRow = row->find(it->first);
 		if (itRow == row->end() || itRow->first > it->first ) {
-			row->insert(pair<int, double>(it->first, -1 * (it->second) * coeficiente)); //le agregue un -1 por la resta
+			row->insert(pair<int, double>(it->first, -1 * (it->second) * coeficiente)); 
 		}
 		else {
-			itRow->second = (itRow->second) - coeficiente * (it->second);
+			double restaObtenida = (itRow->second) - coeficiente * (it->second);
+			if (restaObtenida != 0)
+				itRow->second = restaObtenida;
 		}
 	}
 }
 
-void elimincacionGaussiana(Rala* A) {
-	int n = A->n;
-	for (int i = 0; i < n; i++) {
-		int filaMax = maxIndexInMapFromKey(A, i, A->n);
-		if (filaMax != -1) {
-			//--------------------  Reacomodar posiciones.
-			map<int, double> * mapTemp = (A->conex)[i];
-			(A->conex)[i] = (A->conex)[filaMax];
-			(A->conex)[filaMax] = mapTemp;
-			//-------------------- 	transformar los ceros	
-			map<int, double>* pivot = A->conex[i];
 
-			for (int j = i + 1; j < A->n; j++) {
-				map<int, double> * row = A->conex[j];
-				if (row->find(i) != row->end()) {
-					reduceRowFromPivot(row, pivot, i, n);
+
+//ELIMINACION GAUSIANA
+
+void elimincacionGaussianaSinPivoteo(Rala & A, Rala & Linv){
+	int n = A.n ;
+	for(int i = 0  ; i < n ; i ++){
+		int filaMax = maxIndexInMapFromKey(&A, i, A.n);
+		if(filaMax != -1){
+//-------------------- 	transformar los ceros	
+			map<int,double>* pivot = A.conex[i];
+
+			for(int j = i+1; j < A.n ; j++){
+				map<int,double> * row = A.conex[j];
+				if(row -> find(i) != row->end()){
+					reduceRowFromPivot(row,pivot, j, i ,n, &Linv);
+				}
+			}
+		}
+		cout << "Matriz en la iteracion " << i << " es: " << endl;
+		mostrarRala(&A);
+	}
+}
+
+
+void elimincacionGaussiana(Rala & A, Rala & Linv , Rala & Permu){
+	int n = A.n ;
+	for(int i = 0  ; i < n ; i ++){
+		int filaMax = maxIndexInMapFromKey(&A, i, A.n);
+		if(filaMax != -1){
+//--------------------  Reacomodar posiciones.
+			map<int,double> * mapTempA = (A.conex)[i];
+			map<int,double> * mapTempL = (Linv.conex)[i];
+			map<int,double> * mapTempP = (Linv.conex)[i];
+			
+			
+			(A.conex)[i] = (A.conex)[filaMax];
+			(A.conex)[filaMax] = mapTempA;
+
+			(Linv.conex)[i] = (Linv.conex)[filaMax];
+			(Linv.conex)[filaMax] = mapTempL;
+
+			(Permu.conex)[i] = (Permu.conex)[filaMax];
+			(Permu.conex)[filaMax] = mapTempL;
+//-------------------- 	transformar los ceros	
+			map<int,double>* pivot = A.conex[i];
+
+			for(int j = i+1; j < A.n ; j++){
+				map<int,double> * row = A.conex[j];
+				if(row -> find(i) != row->end()){
+					reduceRowFromPivot(row,pivot, j, i ,n, &Linv);
 				}
 			}
 		}
 	}
+	Rala C = Rala(n);
 
-	// RECREAR LA TRANSPUESTA
+	Rala id = CrearIdentidad(n);
+	sumaMatricial(&Linv, &id, &C);
+	Linv = C;
 }
 
 //NO TIENE QUE TENER CEROS EN LA DIAGONAL
 
-void solveLinearEquations(Rala* A, double conjunta [], double res [], int n ){
-	elimincacionGaussiana(A);
+void solveLinearEquations(Rala* A, vector<double> & conjunta, vector<double> & res , int n ){
+	
 
 	for(int i = n-1; i >= 0 ; i --){
 		double ac = conjunta [i];
@@ -248,6 +340,7 @@ void solveLinearEquations(Rala* A, double conjunta [], double res [], int n ){
 		res[i] = ac / (A -> conex[i])->find(i)->second;
 	} 
 }
+
 
 
 //-------------------------------------------------------------GENERADORES
@@ -446,57 +539,107 @@ void Test1ParaMultPorEsc() { 	// pasa, todo OK
 
 void TestEliminacionGaussiana() {
 	Rala A = Rala(3);
-	/*
-	3 4 4
-	0 2 4
-	5 0 4
-	*/
-	insertarElemento(&A, 0, 0, 3);
-	insertarElemento(&A, 0, 1, 4);
+	Rala Linv = Rala(3);
+	Rala P = CrearIdentidad(3);
+/*
+5 0 4
+3 4 4
+0 2 4
+
+*/
+
+	insertarElemento(&A, 0, 0, 5);
 	insertarElemento(&A, 0, 2, 4);
 
-	insertarElemento(&A, 1, 1, 2);
+
+	insertarElemento(&A, 1, 0, 3);
+	insertarElemento(&A, 1, 1, 4);
 	insertarElemento(&A, 1, 2, 4);
 
-	insertarElemento(&A, 2, 0, 5);
+	insertarElemento(&A, 2, 1, 2);
 	insertarElemento(&A, 2, 2, 4);
 
 
+
+
+	cout << "Matriz A original:" << endl;
 	mostrarRala(&A);
 
-	elimincacionGaussiana(&A);
-
+	elimincacionGaussianaSinPivoteo(A, Linv);
+	cout<< "\nMatriz A con EG: " << endl;
 	mostrarRala(&A);
 
-	Rala B = Rala(3);
+	cout << "\nMatriz L-Inv: "<< endl;
+	mostrarRala(&Linv);
+}
 
-	/*
-	3 4 4
-	0 2 4
-	5 0 4
-	*/
-	insertarElemento(&B, 0, 0, 3);
-	insertarElemento(&B, 0, 2, 4);
+void TestSolveLinearEquatinos(){
+	//System  => A . x = b 
+	int n = 3;
 
-	insertarElemento(&B, 1, 2, 4);
+	Rala A = Rala(n);
+	Rala Linv = CrearIdentidad(n);
 
-	insertarElemento(&B, 2, 0, 5);
-	insertarElemento(&B, 2, 1, 2);
-	insertarElemento(&B, 2, 2, 4);
+/*
+(x1,x2,3) = (1,2,3)
+5 0 4 = 17
+3 4 4 = 23
+0 2 4 = 16
+*/
+	insertarElemento(&A, 0, 0, 5);
+	insertarElemento(&A, 0, 2, 4);
+
+	insertarElemento(&A, 1, 0, 3);
+	insertarElemento(&A, 1, 1, 4);
+	insertarElemento(&A, 1, 2, 4);
+
+	insertarElemento(&A, 2, 1, 2);
+	insertarElemento(&A, 2, 2, 4);
 
 
-	mostrarRala(&B);
+///
+	vector<double> b;
+	b.push_back(17);
+	b.push_back(23);
+	b.push_back(16);
 
-	elimincacionGaussiana(&B);
+	
+	vector<double> res (n); 
 
-	mostrarRala(&B);
+	cout << "Matriz A original:" << endl;
+	mostrarRala(&A);
+
+	elimincacionGaussianaSinPivoteo(A, Linv);
+
+	cout<< "\nMatriz A con EG: " << endl;
+	mostrarRala(&A);
+
+	cout << "\nMatriz L-Inv : "<< endl;
+	mostrarRala(&Linv);
+
+	cout <<"\nVector B : " << endl;
+	mostrarVectorEnteros(b);
+
+
+	multiplicarMatrizPorVector(&Linv,&b); 
+
+	cout <<"\nVector B despues de multiplicar por L-Inv: " << endl;
+	mostrarVectorEnteros(b);
+
+	solveLinearEquations(&A, b,res,n);
+
+	cout << "\nVector Respuesta: "<< endl;
+	mostrarVectorEnteros(res);
+
+
 }
 
 
 int main(){
-	//srand(time(NULL));
+	srand(time(NULL));
+	TestSolveLinearEquatinos();
 	//TestGeneradores(7);
-	TestEliminacionGaussiana();
+	//TestEliminacionGaussiana();
 	//Test1ParaSuma();
 	//Test1ParaMultPorEsc();
 
