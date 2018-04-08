@@ -14,23 +14,19 @@ public:
 	Rala(int size) {
 		n = size;
 
-		vector< map<int, double>* > conecciones(n, NULL);
-		vector< map<int, double>* > transpuesta(n, NULL);
+		vector< map<int, double>* > conecciones (n, NULL);
 
-		for (int i = 0; i < n; i++) {
-			conecciones[i] = new map<int, double>();
-			transpuesta[i] = new map<int, double>();
+		for(int i = 0 ; i < n ; i ++){
+			conecciones[i] = new map<int,double> ();
 		}
 
 		conex = conecciones;
-		transp = transpuesta;
 	}
 
 	~Rala() {
 		for (int i = 0; i < n; i++) {
 			delete(conex[i]);
-			delete(transp[i]);
-		}
+		}		
 	}
 
 	int n;
@@ -67,9 +63,8 @@ void mostrarRala(Rala* matriz) {
 	}
 }
 
-void insertarElemento(Rala* A, int fila, int columna, double valor) {
-	A->conex[fila]->insert(pair<int, double>(columna, valor));
-	A->transp[columna]->insert(pair<int, double>(fila, valor));
+void insertarElemento(Rala* A, int fila, int columna, double valor ){
+	A -> conex[fila] -> insert(pair<int,double>(columna,valor));
 }
 
 // devuelve el grado de la página j (o sea, la cantidad de elems en la columna j, o #linksSalientes)
@@ -119,7 +114,16 @@ void sumaMatricial(Rala* A, Rala* B, Rala* C) {
 	}
 }
 
-double multiplicarFilas(map<int, double>* filA, map<int, double>* colB, int n) {
+void createTranspose(Rala* A, Rala* At){
+	int n = A -> n;
+	for(int i = 0; i < n ; i ++){
+		for(map<int,double>::iterator it = (A -> conex[i]) -> begin() ; it != (A -> conex[i]) -> end(); it ++){
+			insertarElemento(At, i, it->first, it -> second);
+		}
+	}
+}
+
+double multiplicarFilas(map<int,double>* filA, map<int,double>* colB, int n){
 	double ac = 0;
 	map<int, double>::iterator itA = filA->begin();
 	while (itA != filA->end()) {
@@ -135,10 +139,12 @@ double multiplicarFilas(map<int, double>* filA, map<int, double>* colB, int n) {
 // multiplica las matrices A y B y devuelve la multiplicación en C
 void multiplicacionMatricial(Rala* A, Rala* B, Rala* C) {
 	int n = A->n;
-	for (int i = 0; i < n; i++) {
-		for (int j = 0; j < n; j++) {
-			map<int, double>* filA = A->conex[i];
-			map<int, double>* colB = B->transp[j];
+	Rala transp = Rala(n);
+	createTranspose(B, &transp);
+	for(int i = 0; i < n; i++){
+		for(int j = 0 ; j < n ; j ++){
+			map<int,double>* filA = A->conex[i];
+			map<int,double>* colB = transp.conex[j];
 
 			double multRes = multiplicarFilas(filA, colB, n);
 			if (multRes != 0) {
@@ -189,15 +195,15 @@ void reduceRowFromPivot(map<int, double>* row, map<int, double>* pivot, int col,
 
 	for (map<int, double>::iterator it = itPivot; it != pivot->end(); it++) {
 		//lo cambio asi no hacemos una busqueda log n por cada elemento en el map Pivot
-		while (itRow->first != it->first)
+		while (itRow != row->end() && itRow->first < it->first)
 			itRow++;
 		
 		//itRow = row->find(it->first);
-		if (itRow != row->end()) {
-			itRow->second = (itRow->second) - coeficiente * (it->second);
+		if (itRow == row->end() || itRow->first > it->first ) {
+			row->insert(pair<int, double>(it->first, -1 * (it->second) * coeficiente)); //le agregue un -1 por la resta
 		}
 		else {
-			row->insert(pair<int, double>(it->first, -1 * (it->second) * coeficiente)); //le agregue un -1 por la resta
+			itRow->second = (itRow->second) - coeficiente * (it->second);
 		}
 	}
 }
@@ -222,11 +228,31 @@ void elimincacionGaussiana(Rala* A) {
 			}
 		}
 	}
+
+	// RECREAR LA TRANSPUESTA
+}
+
+//NO TIENE QUE TENER CEROS EN LA DIAGONAL
+
+void solveLinearEquations(Rala* A, double conjunta [], double res [], int n ){
+	elimincacionGaussiana(A);
+
+	for(int i = n-1; i >= 0 ; i --){
+		double ac = conjunta [i];
+		for(int j = n-1 ; j > i ; j --){
+			map<int,double>::iterator it2  = (A -> conex[i]) -> find(j);
+			if(it2 != (A -> conex[i])->end() ){
+				ac -= (res[j] * (it2 -> second));	
+			}
+		}
+		res[i] = ac / (A -> conex[i])->find(i)->second;
+	} 
 }
 
 
-
 //-------------------------------------------------------------GENERADORES
+//TODOS LOS GENERADORES TOMAN UNA MATRIZ NULA COMO ENTRADA!
+
 
 //Genera una matriz aleatoria con varios paramtros:
 
@@ -234,6 +260,8 @@ void elimincacionGaussiana(Rala* A) {
 //		 Toma valores de 0 a 10. Si es 0, sera una matriz nula, y si es 10 tendra un valor distinto a 0 para cada Aij.
 //
 //Fmin y Fman es el rango de valores que pueden tomar los elementos de la matriz.
+//Ver que si no es posible hacerse, devuelve un -1
+
 
 int generarMatrizAleatoria(Rala* A, int proba, double fMin, double fMax) {
 	int n = A->n;
@@ -263,17 +291,92 @@ int generarMatrizAleatoria(Rala* A, int proba, double fMin, double fMax) {
 	else {
 
 		return 1;
-
-	}
-
+	
+	}	
 }
 
 
-void TestGeneradores(int prob, int min, int max) {
-	Rala A = Rala(5);
-	generarMatrizAleatoria(&A, prob, min, max);
-	mostrarRala(&A);
+int generarMatrizConectividad(Rala* A, int proba){
+	int n = A->n;
+	int rangoProba = proba;
+	if(rangoProba > 10 || rangoProba < 0){return -1;}
+	
+	if(rangoProba != 0){
 
+		for (int fila = 0; fila < n; ++fila)
+		{
+			for (int columna = 0; columna < n; ++columna)
+			{	
+				if(fila != columna){
+					int prob = (rand() % 10)+1;
+					if(prob <= rangoProba){
+					insertarElemento(A, fila, columna, 1);
+					}	
+				}	
+			}
+		}
+
+		return 1;
+	
+	} else {
+
+		return 1;
+	
+	}	
+
+}
+
+int generarMatrizIdentidad(Rala* A){
+	int n = A->n;
+
+		for (int fila = 0; fila < n; ++fila)
+		{
+			insertarElemento(A, fila, fila, 1);
+		}
+
+		return 1;
+	
+}
+
+//A TIENE QUE SER MATRIZ NULA. W MATRIZ DE CONECTIVIDAD
+int generarMatrizDiagonalD(Rala* A, Rala* W){
+	if (A->n != W->n){ return -1;}
+	int n = W->n;
+
+		for (int fila = 0; fila < n; ++fila)
+		{
+			int grado = gradoSalida(W, fila);
+			if(grado != 0){
+				
+				double valor = 1.0/grado;
+				insertarElemento(A, fila, fila, valor);
+			}
+			
+		}
+
+		return 1;
+	
+}
+
+vector<int> generarVectorE(int n){
+	vector <int> result(n, 1);
+	return result;
+}
+
+
+
+
+
+
+//-------------------------------------------------------------GENERADORES
+
+
+
+void TestGeneradores(int prob){
+	
+	Rala A = Rala(5);
+	generarMatrizConectividad(&A, prob);
+	mostrarRala(&A);
 }
 
 void Test1ParaSuma() { 	// pasa, todo OK
@@ -361,7 +464,7 @@ void TestEliminacionGaussiana() {
 
 	mostrarRala(&A);
 
-	/*elimincacionGaussiana(&A);*/
+	elimincacionGaussiana(&A);
 
 	mostrarRala(&A);
 
@@ -390,7 +493,9 @@ void TestEliminacionGaussiana() {
 }
 
 
-int main() {
+int main(){
+	//srand(time(NULL));
+	//TestGeneradores(7);
 	TestEliminacionGaussiana();
 	//Test1ParaSuma();
 	//Test1ParaMultPorEsc();
