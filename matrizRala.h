@@ -175,15 +175,14 @@ void sumaMatricial(Rala & A, Rala & B, Rala & C){
 
 // auxiliar para la multiplicación matricial
 // utilizada para obtener el elemento C_filAcolB de la multiplicación entre A y B
-double multiplicarFilas(unordered_map<int,double>* filA, unordered_map<int,double>* colB, int n){
+double multiplicarFilas(unordered_map<int,double>* fila, unordered_map<int,double>* col, int n){
 	double ac = 0;
-	unordered_map<int, double>::iterator itA = filA->begin();
-	while(itA != filA->end()){
-		unordered_map<int, double>::iterator itElemB = colB->find(itA->first);
-		if(itElemB != colB->end()){
-			ac += itA->second * itElemB->second;
-		}
-		itA++;
+	for(int i = 0 ; i < n ; i ++){
+		unordered_map<int, double>::iterator itF = fila -> find(i);
+		unordered_map<int, double>::iterator itC = col  -> find(i);
+		if(itF != fila -> end() && itC != col -> end()){
+			ac += itF->second * itC -> second;
+		} 
 	}
 	return ac;
 }
