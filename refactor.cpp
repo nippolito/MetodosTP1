@@ -9,9 +9,9 @@
 
 using namespace std;
 
-class Rala {
+class Rala{
 public:
-	Rala(int size) {
+	Rala(int size ){
 		n = size;
 
 		vector< map<int, double>* > conecciones (n, NULL);
@@ -23,8 +23,8 @@ public:
 		conex = conecciones;
 	}
 
-	~Rala() {
-		for (int i = 0; i < n; i++) {
+	~Rala(){
+		for(int i = 0 ; i < n ; i ++){
 			delete(conex[i]);
 		}		
 	}
@@ -54,22 +54,20 @@ void mostrarVectorEnteros(vector<double> v ){
 void mostrarVectorPair(map<int,double>* m, int n){
 	// cout << "longitud de vec: " << vec.size() << endl;
 	cout << "[";
-	for (int i = 0; i < n; i++) {
-		map<int, double>::iterator it = m->find(i);
-		const char* comaOrEnd = i == n - 1 ? "" : ", ";
-		if (it != m->end()) {
-			cout << it->second << comaOrEnd;
-		}
-		else {
-			cout << "0";
-			cout << comaOrEnd;
+	for(int i =  0 ; i < n ; i ++){
+		map<int,double>::iterator it = m -> find(i);
+		string comaOrEnd = i == n-1 ? "" : ", "; 
+		if(it != m->end()){
+			cout <<  it -> second << comaOrEnd;
+		}else{
+			cout <<"0" << comaOrEnd;
 		}
 	}
 	cout << "]" << endl;
 }
 
-void mostrarRala(Rala* matriz) {
-	for (int link = 0; link < matriz->n; link++) {
+void mostrarRala(Rala* matriz){
+	for(int link = 0; link < matriz->n; link++){
 		mostrarVectorPair(matriz->conex[link], matriz->n);
 	}
 }
@@ -95,11 +93,11 @@ Rala CrearIdentidad(int n ){
 
 // devuelve el grado de la página j (o sea, la cantidad de elems en la columna j, o #linksSalientes)
 // es O((#conexiones)logn)
-int gradoSalida(struct Rala* A, int j) {
+int gradoSalida(struct Rala* A, int j){
 	int res = 0;
 	int n = A->n;
-	for (int i = 0; i < n; i++) {
-		if (A->conex[i]->find(j) != A->conex[i]->end()) {
+	for(int i = 0; i < n; i++){
+		if( A->conex[i] -> find(j) != A->conex[i] -> end()){
 			res++;
 		}
 	}
@@ -107,34 +105,35 @@ int gradoSalida(struct Rala* A, int j) {
 }
 
 // suma las matrices A y B y devuelve la suma en C
-void sumaMatricial(Rala* A, Rala* B, Rala* C) {
+void sumaMatricial(Rala* A, Rala* B, Rala* C){
+	/*
 	cout << "MATRIZ A: " << endl;
 	mostrarRala(A);
 	cout << "MATRIZ B: " << endl;
 	mostrarRala(B);
-
+	*/
 	int n = A->n;
-	for (int i = 0; i < n; i++) {
+	for(int i = 0; i < n; i++){
 		map<int, double>* filA = A->conex[i];
 		map<int, double>* filB = B->conex[i];
 
 		map<int, double>::iterator itA = filA->begin();
 		map<int, double>::iterator itB = filB->begin();
+		
 
-
-		while (itA != filA->end() || itB != filB->end()) {
-			if (itB == filB->end() || ((itA->first < itB->first) && itA != filA->end())) {
+		while(itA != filA->end() || itB != filB->end()){
+			if( itB == filB->end()  ||  ((itA -> first < itB -> first) && itA != filA->end()) ){
 				insertarElemento(C, i, itA->first, itA->second);
-				itA++;
+				itA ++;
 			}
-			else if (itA == filA->end() || ((itA->first > itB->first) && itB != filB->end())) {
+			else if( itA == filA->end() || ((itA -> first > itB -> first) && itB != filB->end()) ){
 				insertarElemento(C, i, itB->first, itB->second);
-				itB++;
+				itB ++;
 			}
-			else {
-				insertarElemento(C, i, itA->first, itA->second + itB->second);
-				itA++;
-				itB++;
+			else{
+				insertarElemento(C, i, itA->first, itA->second + itB -> second);
+				itA ++;
+				itB ++;
 			}
 		}
 	}
@@ -152,9 +151,9 @@ void createTranspose(Rala* A, Rala* At){
 double multiplicarFilas(map<int,double>* filA, map<int,double>* colB, int n){
 	double ac = 0;
 	map<int, double>::iterator itA = filA->begin();
-	while (itA != filA->end()) {
+	while(itA != filA->end()){
 		map<int, double>::iterator itElemB = colB->find(itA->first);
-		if (itElemB != colB->end()) {
+		if(itElemB != colB->end()){
 			ac += itA->second * itElemB->second;
 		}
 		itA++;
@@ -163,7 +162,7 @@ double multiplicarFilas(map<int,double>* filA, map<int,double>* colB, int n){
 }
 
 // multiplica las matrices A y B y devuelve la multiplicación en C
-void multiplicacionMatricial(Rala* A, Rala* B, Rala* C) {
+void multiplicacionMatricial(Rala* A, Rala* B, Rala* C){
 	int n = A->n;
 	Rala transp = Rala(n);
 	createTranspose(B, &transp);
@@ -173,66 +172,64 @@ void multiplicacionMatricial(Rala* A, Rala* B, Rala* C) {
 			map<int,double>* colB = transp.conex[j];
 
 			double multRes = multiplicarFilas(filA, colB, n);
-			if (multRes != 0) {
-				insertarElemento(C, i, j, multRes);
+			if(multRes != 0 ){
+				insertarElemento(C,i,j,multRes);
 			}
 		}
 	}
 }
 
 
-//modifica v ! 
+
 vector<double> multiplicarMatrizPorVector(Rala* A, vector<double>* v){
 	int n = A -> n ;
 	vector<double> res (n);
 	for(int i = 0; i < n; i ++){
 		map<int,double>* row = A ->conex[i];
-		double ac = 0 ;
+		double ac = 0.0 ;
 		for(map<int,double>::iterator it  = row->begin(); it != row->end(); it++){
 			ac += (it->second) * (*v)[it->first];
 		}
-		(*v)[i] = ac;
-	}
+              (*v)[i] = ac;
+  		}
 	for(int i = 0 ; i < n ; i ++){
-		res[i] = (*v)[i];
-	}
+	    res[i] = (*v)[i];
+    }
+
 	return res;
 }
 
 // modifica A
-void multiplicacionPorEscalar(Rala* A, double valor) {
-	for (int i = 0; i < A->conex.size(); i++) {
-		for (map<int, double>::iterator it = (A->conex[i])->begin(); it != (A->conex[i])->end(); it++) {
-			it->second *= valor;
+void multiplicacionPorEscalar(Rala* A, double valor ){
+	for (int i = 0; i < A->conex.size(); i++){
+		for(map<int,double>::iterator it = (A -> conex[i])->begin(); it != (A -> conex[i])->end(); it++){
+			it -> second *= valor;
 		}
 	}
 }
 
-int maxIndexInMapFromKey(Rala* r, int col, int n) {
+int maxIndexInMapFromKey(Rala* r, int col, int n ){
 	double maxIndex = -1;
 	double maxVal = 0;
-	for (int i = col; i < n; i++) {
-		map<int, double>::iterator it = r->conex[i]->find(col);
-		if (it != (r->conex[i])->end()) {
-			if (abs(it->second) > abs(maxVal)) {
-				maxVal = it->second;
-				maxIndex = i;
+	for(int i = col; i < n; i++){
+		map<int,double>::iterator it =  r->conex[i]->find(col);
+		if( it != (r->conex[i])->end()){
+			if(abs(it->second) > abs(maxVal)){
+					maxVal = it->second;
+					maxIndex = i;			
 			}
 		}
 	}
 	return maxIndex;
 }
 
-int firstIndexWithValueDifferentThatZeroFrom(map<int, double>* m, int i, int n) {
-	for (int j = i; j < n; j++) {
-		if (m->find(j) != m->end()) return j;
+int firstIndexWithValueDifferentThatZeroFrom(map<int,double>* m, int i, int n){
+	for(int j = i ; j < n ; j ++){
+		if(m->find(j) != m->end()) return j;
 	}
 	return -1;
 }
 
-void reduceRowFromPivot(map<int, double>* row, map<int, double>* pivot, int col, int n) {
-	map<int, double>::iterator itPivot = pivot->find(col); //deberian ser lo mismo que it begin
-	map<int, double>::iterator itRow = row->find(col); //deberian ser lo mismo que it begin
 
 
 
@@ -242,22 +239,20 @@ void reduceRowFromPivot(map<int,double>* row, map<int,double>* pivot, int fila, 
 	double pivotBase = itPivot->second;
 	double rowBase = itRow->second;
 	double coeficiente = rowBase / pivotBase;
-
+	//cout << "EL COEFICIENTE ES : " << coeficiente << endl;
+	
 	insertarElemento(Linv, fila, col, coeficiente * -1);
-
-	for (map<int, double>::iterator it = itPivot; it != pivot->end(); it++) {
-		//lo cambio asi no hacemos una busqueda log n por cada elemento en el map Pivot
-		while (itRow != row->end() && itRow->first < it->first)
-			itRow++;
-		
-		//itRow = row->find(it->first);
-		if (itRow == row->end() || itRow->first > it->first ) {
-			row->insert(pair<int, double>(it->first, -1 * (it->second) * coeficiente)); 
-		}
-		else {
-			double restaObtenida = (itRow->second) - coeficiente * (it->second);
-			if (restaObtenida != 0)
-				itRow->second = restaObtenida;
+	
+	for(map<int,double>::iterator it = itPivot; it != pivot -> end(); it ++){
+		itRow = row->find(it->first);
+		if(itRow != row -> end()){
+			if( (itRow -> second) - coeficiente * (it -> second ) != 0 ){
+				itRow -> second = (itRow -> second) - coeficiente * (it -> second );
+			}else{
+				row->erase(itRow);
+			}
+		}else{
+			row -> insert(pair<int,double>(it->first, -1 * (it->second) * coeficiente));
 		}
 	}
 }
@@ -271,7 +266,7 @@ void elimincacionGaussianaSinPivoteo(Rala & A, Rala & Linv){
 	for(int i = 0  ; i < n ; i ++){
 		int filaMax = maxIndexInMapFromKey(&A, i, A.n);
 		if(filaMax != -1){
-//-------------------- 	transformar los ceros	
+	//-------------------- 	transformar los ceros	
 			map<int,double>* pivot = A.conex[i];
 
 			for(int j = i+1; j < A.n ; j++){
@@ -281,8 +276,8 @@ void elimincacionGaussianaSinPivoteo(Rala & A, Rala & Linv){
 				}
 			}
 		}
-		cout << "Matriz en la iteracion " << i << " es: " << endl;
-		mostrarRala(&A);
+		//cout << "Matriz en la iteracion " << i << " es: " << endl;
+		//mostrarRala(&A);
 	}
 }
 
@@ -292,7 +287,7 @@ void elimincacionGaussiana(Rala & A, Rala & Linv , Rala & Permu){
 	for(int i = 0  ; i < n ; i ++){
 		int filaMax = maxIndexInMapFromKey(&A, i, A.n);
 		if(filaMax != -1){
-//--------------------  Reacomodar posiciones.
+	//--------------------  Reacomodar posiciones.
 			map<int,double> * mapTempA = (A.conex)[i];
 			map<int,double> * mapTempL = (Linv.conex)[i];
 			map<int,double> * mapTempP = (Linv.conex)[i];
@@ -306,7 +301,7 @@ void elimincacionGaussiana(Rala & A, Rala & Linv , Rala & Permu){
 
 			(Permu.conex)[i] = (Permu.conex)[filaMax];
 			(Permu.conex)[filaMax] = mapTempL;
-//-------------------- 	transformar los ceros	
+		//-------------------- 	transformar los ceros	
 			map<int,double>* pivot = A.conex[i];
 
 			for(int j = i+1; j < A.n ; j++){
@@ -328,7 +323,6 @@ void elimincacionGaussiana(Rala & A, Rala & Linv , Rala & Permu){
 
 void solveLinearEquations(Rala* A, vector<double> & conjunta, vector<double> & res , int n ){
 	
-
 	for(int i = n-1; i >= 0 ; i --){
 		double ac = conjunta [i];
 		for(int j = n-1 ; j > i ; j --){
@@ -356,32 +350,31 @@ void solveLinearEquations(Rala* A, vector<double> & conjunta, vector<double> & r
 //Ver que si no es posible hacerse, devuelve un -1
 
 
-int generarMatrizAleatoria(Rala* A, int proba, double fMin, double fMax) {
+int generarMatrizAleatoria(Rala* A, int proba, double fMin, double fMax){
 	int n = A->n;
 	int rangoProba = proba;
-	if (rangoProba > 10 || rangoProba < 0 || fMin > fMax) { return -1; }
+	if(rangoProba > 10 || rangoProba < 0 || fMin > fMax ){return -1;}
 
-	if (rangoProba == 10) { rangoProba = 9; }
-
-	if (rangoProba != 0) {
+	if (rangoProba == 10){rangoProba = 9; }
+	
+	if(rangoProba != 0){
 
 		for (int fila = 0; fila < n; ++fila)
 		{
 			for (int columna = 0; columna < n; ++columna)
 			{
 				int prob = rand() % 10;
-				if (prob <= rangoProba) {
+				if(prob <= rangoProba){
 
-					double valor = (fMax - fMin) * ((double)rand() / (double)RAND_MAX) + fMin;
-					insertarElemento(A, fila, columna, valor);
+					double valor = (fMax - fMin) * ( (double)rand() / (double)RAND_MAX ) + fMin;
+					insertarElemento(A, fila, columna, valor );
 				}
 			}
 		}
 
 		return 1;
-
-	}
-	else {
+	
+	} else {
 
 		return 1;
 	
@@ -451,11 +444,38 @@ int generarMatrizDiagonalD(Rala* A, Rala* W){
 	
 }
 
-vector<int> generarVectorE(int n){
-	vector <int> result(n, 1);
+vector<double> generarVectorE(int n){
+	vector <double> result(n, 1.0);
 	return result;
 }
 
+void resolverEcuacion(Rala* W, vector<double>& res, double p){
+	int n = W->n;
+	Rala WxDxp = Rala(n);
+	Rala MatrizAIgualar = Rala(n);
+	Rala I = CrearIdentidad(n);
+	Rala I2 = CrearIdentidad(n);
+	Rala D  = Rala(n);
+	Rala L = CrearIdentidad(n);
+	vector<double> e = generarVectorE(n);	//Creo e 
+
+	double prob = p * (-1); //uso -p para poder multiplicar directamente y luego usar sumaMatricial.
+
+	generarMatrizDiagonalD(&D, W); //Creo D
+	multiplicacionMatricial(W,&D,&WxDxp); //WD => AUX1
+	multiplicacionPorEscalar(&WxDxp, prob); //AUX1 = -pWD
+	sumaMatricial(&I, &WxDxp, &MatrizAIgualar);		//AUX2 = (I + (-pWD))
+	
+	
+	elimincacionGaussianaSinPivoteo(MatrizAIgualar, L);
+
+
+	multiplicarMatrizPorVector(&L, &e);
+
+	solveLinearEquations(&MatrizAIgualar, e, res, n);	//Resuelvo ecuacion y devuelvo resultado en res pasado por parametro.
+
+
+}
 
 
 
@@ -472,7 +492,7 @@ void TestGeneradores(int prob){
 	mostrarRala(&A);
 }
 
-void Test1ParaSuma() { 	// pasa, todo OK
+void Test1ParaSuma(){ 	// pasa, todo OK
 	Rala A = Rala(3);
 
 	Rala B = Rala(3);
@@ -495,7 +515,7 @@ void Test1ParaSuma() { 	// pasa, todo OK
 	mostrarRala(&C);
 }
 
-void Test1ParaMult() { 	// pasa, todo OK
+void Test1ParaMult(){ 	// pasa, todo OK
 	Rala A = Rala(3);
 
 	Rala B = Rala(3);
@@ -516,10 +536,10 @@ void Test1ParaMult() { 	// pasa, todo OK
 	Rala C = Rala(A.n);
 	multiplicacionMatricial(&A, &B, &C);
 	cout << endl;
-	mostrarRala(&C);
+	mostrarRala(&C);	
 }
 
-void Test1ParaMultPorEsc() { 	// pasa, todo OK
+void Test1ParaMultPorEsc(){ 	// pasa, todo OK
 	Rala A = Rala(3);
 
 	insertarElemento(&A, 0, 2, 3);
@@ -534,19 +554,19 @@ void Test1ParaMultPorEsc() { 	// pasa, todo OK
 	multiplicacionPorEscalar(&A, valor);
 
 	cout << endl;
-	mostrarRala(&A);
+	mostrarRala(&A);	
 }
 
-void TestEliminacionGaussiana() {
+void TestEliminacionGaussiana(){
 	Rala A = Rala(3);
 	Rala Linv = Rala(3);
 	Rala P = CrearIdentidad(3);
-/*
-5 0 4
-3 4 4
-0 2 4
+	/*
+	5 0 4
+	3 4 4
+	0 2 4
 
-*/
+	*/
 
 	insertarElemento(&A, 0, 0, 5);
 	insertarElemento(&A, 0, 2, 4);
@@ -580,12 +600,12 @@ void TestSolveLinearEquatinos(){
 	Rala A = Rala(n);
 	Rala Linv = CrearIdentidad(n);
 
-/*
-(x1,x2,3) = (1,2,3)
-5 0 4 = 17
-3 4 4 = 23
-0 2 4 = 16
-*/
+	/*
+	(x1,x2,3) = (1,2,3)
+	5 0 4 = 17
+	3 4 4 = 23
+	0 2 4 = 16
+	*/
 	insertarElemento(&A, 0, 0, 5);
 	insertarElemento(&A, 0, 2, 4);
 
@@ -597,7 +617,6 @@ void TestSolveLinearEquatinos(){
 	insertarElemento(&A, 2, 2, 4);
 
 
-///
 	vector<double> b;
 	b.push_back(17);
 	b.push_back(23);
@@ -634,10 +653,27 @@ void TestSolveLinearEquatinos(){
 
 }
 
+void TestEcuaciones(){
+	Rala W = Rala(5);
+	generarMatrizConectividad(&W, 5);
+	vector<double> res(5,0.0);
+	resolverEcuacion(&W, res, 1.0);
+	cout << endl;
+
+	cout << "REUSLTADO FINAL: " << endl;
+	
+	for (int i = 0; i < res.size(); ++i)
+	{
+		cout << res [i] << endl;
+	}
+	
+}
+
 
 int main(){
 	srand(time(NULL));
-	TestSolveLinearEquatinos();
+	TestEcuaciones();
+	//TestSolveLinearEquatinos();
 	//TestGeneradores(7);
 	//TestEliminacionGaussiana();
 	//Test1ParaSuma();
