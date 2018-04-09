@@ -190,8 +190,11 @@ vector<double> multiplicarMatrizPorVector(Rala* A, vector<double>* v){
 		for(map<int,double>::iterator it  = row->begin(); it != row->end(); it++){
 			ac += (it->second) * (*v)[it->first];
 		}
-		res[i] = ac;
-	}
+              (*v)[i] = ac;
+  		}
+	for(int i = 0 ; i < n ; i ++){
+	    res[i] = (*v)[i];
+    }
 
 	return res;
 }
@@ -319,12 +322,6 @@ void elimincacionGaussiana(Rala & A, Rala & Linv , Rala & Permu){
 //NO TIENE QUE TENER CEROS EN LA DIAGONAL
 
 void solveLinearEquations(Rala* A, vector<double> & conjunta, vector<double> & res , int n ){
-	mostrarRala(A);
-
-	for (int i = 0; i < conjunta.size(); ++i)
-	{
-		cout << conjunta [i] << endl;
-	}
 	
 	for(int i = n-1; i >= 0 ; i --){
 		double ac = conjunta [i];
@@ -452,28 +449,30 @@ vector<double> generarVectorE(int n){
 	return result;
 }
 
-void resolverEcuacion(Rala* W, vector<double> res, double p){
+void resolverEcuacion(Rala* W, vector<double>& res, double p){
 	int n = W->n;
-	Rala aux1 = Rala(n);
-	Rala aux2 = Rala(n);
-	Rala I = Rala(n);
-	Rala I2 = Rala(n);
+	Rala WxDxp = Rala(n);
+	Rala MatrizAIgualar = Rala(n);
+	Rala I = CrearIdentidad(n);
+	Rala I2 = CrearIdentidad(n);
 	Rala D  = Rala(n);
-	Rala L = Rala(n);
+	Rala L = CrearIdentidad(n);
+	vector<double> e = generarVectorE(n);	//Creo e 
+
 	double prob = p * (-1); //uso -p para poder multiplicar directamente y luego usar sumaMatricial.
 
 	generarMatrizDiagonalD(&D, W); //Creo D
-	generarMatrizIdentidad(&I);		//Creo I
-	generarMatrizIdentidad(&I2);		//Creo I
-	multiplicacionMatricial(W,&D,&aux1); //WD => AUX1
-	multiplicacionPorEscalar(&aux1, prob); //AUX1 = -pWD
-	sumaMatricial(&I, &aux1, &aux2);		//AUX2 = (I + (-pWD))
-	vector<double> e = generarVectorE(n);	//Creo e
+	multiplicacionMatricial(W,&D,&WxDxp); //WD => AUX1
+	multiplicacionPorEscalar(&WxDxp, prob); //AUX1 = -pWD
+	sumaMatricial(&I, &WxDxp, &MatrizAIgualar);		//AUX2 = (I + (-pWD))
 	
-	elimincacionGaussianaSinPivoteo(aux2, L);
-	vector<double> nuevae = multiplicarMatrizPorVector(&L, &e);
+	
+	elimincacionGaussianaSinPivoteo(MatrizAIgualar, L);
 
-	solveLinearEquations(&aux2, nuevae, res, n);	//Resuelvo ecuacion y devuelvo resultado en res pasado por parametro.
+
+	multiplicarMatrizPorVector(&L, &e);
+
+	solveLinearEquations(&MatrizAIgualar, e, res, n);	//Resuelvo ecuacion y devuelvo resultado en res pasado por parametro.
 
 
 }
@@ -484,21 +483,6 @@ void resolverEcuacion(Rala* W, vector<double> res, double p){
 
 //-------------------------------------------------------------GENERADORES
 
-void TestEcuaciones(){
-	Rala W = Rala(5);
-	generarMatrizConectividad(&W, 5);
-	vector<double> res(5,0.0);
-	resolverEcuacion(&W, res, 1.0);
-	cout << endl;
-
-	cout << "REUSLTADO FINAL: " << endl;
-	
-	for (int i = 0; i < res.size(); ++i)
-	{
-		cout << res [i] << endl;
-	}
-	
-}
 
 
 void TestGeneradores(int prob){
@@ -667,6 +651,22 @@ void TestSolveLinearEquatinos(){
 	mostrarVectorEnteros(res);
 
 
+}
+
+void TestEcuaciones(){
+	Rala W = Rala(5);
+	generarMatrizConectividad(&W, 5);
+	vector<double> res(5,0.0);
+	resolverEcuacion(&W, res, 1.0);
+	cout << endl;
+
+	cout << "REUSLTADO FINAL: " << endl;
+	
+	for (int i = 0; i < res.size(); ++i)
+	{
+		cout << res [i] << endl;
+	}
+	
 }
 
 
