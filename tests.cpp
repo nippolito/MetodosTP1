@@ -17,8 +17,8 @@
 //Ver que si no es posible hacerse, devuelve un -1
 
 
-int generarMatrizAleatoria(Rala* A, int proba, double fMin, double fMax){
-	int n = A->n;
+int generarMatrizAleatoria(Rala& A, int proba, double fMin, double fMax){
+	int n = A.n;
 	int rangoProba = proba;
 	if(rangoProba > 10 || rangoProba < 0 || fMin > fMax ){return -1;}
 
@@ -49,8 +49,8 @@ int generarMatrizAleatoria(Rala* A, int proba, double fMin, double fMax){
 }
 
 
-int generarMatrizConectividad(Rala* A, int proba){
-	int n = A->n;
+int generarMatrizConectividad(Rala A, int proba){
+	int n = A.n;
 	int rangoProba = proba;
 	if(rangoProba > 10 || rangoProba < 0){return -1;}
 	
@@ -79,8 +79,8 @@ int generarMatrizConectividad(Rala* A, int proba){
 
 }
 
-int generarMatrizIdentidad(Rala* A){
-	int n = A->n;
+int generarMatrizIdentidad(Rala A){
+	int n = A.n;
 
 		for (int fila = 0; fila < n; ++fila)
 		{
@@ -98,8 +98,8 @@ int generarMatrizIdentidad(Rala* A){
 void TestGeneradores(int prob){
 	
 	Rala A = Rala(5);
-	generarMatrizConectividad(&A, prob);
-	mostrarRala(&A);
+	generarMatrizConectividad(A, prob);
+	mostrarRala(A);
 }
 
 void Test1ParaSuma(){ 	// pasa, todo OK
@@ -107,22 +107,22 @@ void Test1ParaSuma(){ 	// pasa, todo OK
 
 	Rala B = Rala(3);
 
-	insertarElemento(&A, 0, 0, 4);
-	insertarElemento(&A, 0, 2, 2);
-	insertarElemento(&A, 1, 2, 1);
-	insertarElemento(&A, 2, 1, 2);
+	insertarElemento(A, 0, 0, 4);
+	insertarElemento(A, 0, 2, 2);
+	insertarElemento(A, 1, 2, 1);
+	insertarElemento(A, 2, 1, 2);
 
-	insertarElemento(&B, 0, 2, 5);
-	insertarElemento(&B, 1, 0, 3);
-	insertarElemento(&B, 1, 1, 2);
-	insertarElemento(&B, 2, 2, 3);
+	insertarElemento(B, 0, 2, 5);
+	insertarElemento(B, 1, 0, 3);
+	insertarElemento(B, 1, 1, 2);
+	insertarElemento(B, 2, 2, 3);
 
 	Rala C = Rala(A.n);
 	cout << "MATRIZ RESULTADO VACIA: " << endl;
-	mostrarRala(&C);
-	sumaMatricial(&A, &B, &C);
+	mostrarRala(C);
+	sumaMatricial(A, B, C);
 	cout << "MATRIZ FINAL:" << endl;
-	mostrarRala(&C);
+	mostrarRala(C);
 }
 
 void Test1ParaMult(){ 	// pasa, todo OK
@@ -130,41 +130,41 @@ void Test1ParaMult(){ 	// pasa, todo OK
 
 	Rala B = Rala(3);
 
-	insertarElemento(&A, 0, 2, 3);
-	insertarElemento(&A, 1, 0, 2);
-	insertarElemento(&A, 1, 1, 1);
-	insertarElemento(&A, 2, 1, 2);
-	insertarElemento(&B, 0, 0, 4);
-	insertarElemento(&B, 0, 1, 2);
-	insertarElemento(&B, 1, 2, 1);
-	insertarElemento(&B, 2, 0, 1);
-	insertarElemento(&B, 2, 2, 3);
+	insertarElemento(A, 0, 2, 3);
+	insertarElemento(A, 1, 0, 2);
+	insertarElemento(A, 1, 1, 1);
+	insertarElemento(A, 2, 1, 2);
+	insertarElemento(B, 0, 0, 4);
+	insertarElemento(B, 0, 1, 2);
+	insertarElemento(B, 1, 2, 1);
+	insertarElemento(B, 2, 0, 1);
+	insertarElemento(B, 2, 2, 3);
 
-	mostrarRala(&A);
-	mostrarRala(&B);
+	mostrarRala(A);
+	mostrarRala(B);
 
 	Rala C = Rala(A.n);
-	multiplicacionMatricial(&A, &B, &C);
+	multiplicacionMatricial(A, B, C);
 	cout << endl;
-	mostrarRala(&C);	
+	mostrarRala(C);	
 }
 
 void Test1ParaMultPorEsc(){ 	// pasa, todo OK
 	Rala A = Rala(3);
 
-	insertarElemento(&A, 0, 2, 3);
-	insertarElemento(&A, 1, 0, 2);
-	insertarElemento(&A, 1, 1, 1);
-	insertarElemento(&A, 2, 1, 2);
+	insertarElemento(A, 0, 2, 3);
+	insertarElemento(A, 1, 0, 2);
+	insertarElemento(A, 1, 1, 1);
+	insertarElemento(A, 2, 1, 2);
 
 	cout << endl;
-	mostrarRala(&A);
+	mostrarRala(A);
 
 	double valor = 2.7378;
-	multiplicacionPorEscalar(&A, valor);
+	multiplicacionPorEscalar(A, valor);
 
 	cout << endl;
-	mostrarRala(&A);	
+	mostrarRala(A);	
 }
 
 void TestEliminacionGaussiana(){
@@ -178,29 +178,29 @@ void TestEliminacionGaussiana(){
 
 	*/
 
-	insertarElemento(&A, 0, 0, 5);
-	insertarElemento(&A, 0, 2, 4);
+	insertarElemento(A, 0, 0, 5);
+	insertarElemento(A, 0, 2, 4);
 
 
-	insertarElemento(&A, 1, 0, 3);
-	insertarElemento(&A, 1, 1, 4);
-	insertarElemento(&A, 1, 2, 4);
+	insertarElemento(A, 1, 0, 3);
+	insertarElemento(A, 1, 1, 4);
+	insertarElemento(A, 1, 2, 4);
 
-	insertarElemento(&A, 2, 1, 2);
-	insertarElemento(&A, 2, 2, 4);
+	insertarElemento(A, 2, 1, 2);
+	insertarElemento(A, 2, 2, 4);
 
 
 
 
 	cout << "Matriz A original:" << endl;
-	mostrarRala(&A);
+	mostrarRala(A);
 
 	eliminacionGaussiana(A, Linv);
 	cout<< "\nMatriz A con EG: " << endl;
-	mostrarRala(&A);
+	mostrarRala(A);
 
 	cout << "\nMatriz L-Inv: "<< endl;
-	mostrarRala(&Linv);
+	mostrarRala(Linv);
 }
 
 void TestSolveLinearEquatinos(){
@@ -216,15 +216,15 @@ void TestSolveLinearEquatinos(){
 	3 4 4 = 23
 	0 2 4 = 16
 	*/
-	insertarElemento(&A, 0, 0, 5);
-	insertarElemento(&A, 0, 2, 4);
+	insertarElemento(A, 0, 0, 5);
+	insertarElemento(A, 0, 2, 4);
 
-	insertarElemento(&A, 1, 0, 3);
-	insertarElemento(&A, 1, 1, 4);
-	insertarElemento(&A, 1, 2, 4);
+	insertarElemento(A, 1, 0, 3);
+	insertarElemento(A, 1, 1, 4);
+	insertarElemento(A, 1, 2, 4);
 
-	insertarElemento(&A, 2, 1, 2);
-	insertarElemento(&A, 2, 2, 4);
+	insertarElemento(A, 2, 1, 2);
+	insertarElemento(A, 2, 2, 4);
 
 
 	vector<double> b;
@@ -235,27 +235,7 @@ void TestSolveLinearEquatinos(){
 	
 	vector<double> res (n); 
 
-	cout << "Matriz A original:" << endl;
-	mostrarRala(&A);
-
-	eliminacionGaussiana(A, Linv);
-
-	cout<< "\nMatriz A con EG: " << endl;
-	mostrarRala(&A);
-
-	cout << "\nMatriz L-Inv : "<< endl;
-	mostrarRala(&Linv);
-
-	cout <<"\nVector B : " << endl;
-	mostrarVectorEnteros(b);
-
-
-	multiplicarMatrizPorVector(&Linv,&b); 
-
-	cout <<"\nVector B despues de multiplicar por L-Inv: " << endl;
-	mostrarVectorEnteros(b);
-
-	solveLinearEquations(&A, b,res,n);
+	solveLinearEquations(A, b,res,n);
 
 	cout << "\nVector Respuesta: "<< endl;
 	mostrarVectorEnteros(res);
@@ -263,9 +243,9 @@ void TestSolveLinearEquatinos(){
 
 void TestEcuaciones(){
 	Rala W = Rala(5);
-	generarMatrizConectividad(&W, 5);
+	generarMatrizConectividad(W, 5);
 	vector<double> res(5,0.0);
-	resolverPageRank(&W, res, 1.0);
+	resolverPageRank(W, res, 1.0);
 	cout << endl;
 
 	cout << "RESULTADO FINAL: " << endl;
@@ -302,14 +282,14 @@ void Test15SegCatedra(){
 		int dest;
 		ent >> source;
 		ent >> dest;
-		insertarElemento(&W, dest - 1, source - 1, 1);
+		insertarElemento(W, dest - 1, source - 1, 1);
 	}
 
 	// corro el código que resuelve el pageRank
 
 	double p = 0.9;
 	vector<double> res(n, 0);
-	resolverPageRank(&W, res, p);
+	resolverPageRank(W, res, p);
 
 
 	// guardo en el archivo de salida los resultados
@@ -338,7 +318,7 @@ void Test30SegCatedra(){
 		int dest;
 		ent >> source;
 		ent >> dest;
-		insertarElemento(&W, dest - 1, source - 1, 1);
+		insertarElemento(W, dest - 1, source - 1, 1);
 	}
 
 	// corro el código que resuelve el pageRank
@@ -363,7 +343,7 @@ void TestAleatorioCatedra(){
 		int dest;
 		ent >> source;
 		ent >> dest;
-		insertarElemento(&W, dest - 1, source - 1, 1);
+		insertarElemento(W, dest - 1, source - 1, 1);
 	}
 
 	// corro el código que resuelve el pageRank
@@ -388,14 +368,14 @@ void TestAleatorioDesordenadoCatedra(){
 		int dest;
 		ent >> source;
 		ent >> dest;
-		insertarElemento(&W, dest - 1, source - 1, 1);
+		insertarElemento(W, dest - 1, source - 1, 1);
 	}
 
 	// corro el código que resuelve el pageRank
 
 	double p = 0.76;
 	vector<double> res(n, 0);
-	resolverPageRank(&W, res, p);
+	resolverPageRank(W, res, p);
 
 	// guardo en el archivo de salida los resultados
 	sal << p << endl;
@@ -423,7 +403,7 @@ void TestCompleto(){
 		int dest;
 		ent >> source;
 		ent >> dest;
-		insertarElemento(&W, dest - 1, source - 1, 1);
+		insertarElemento(W, dest - 1, source - 1, 1);
 	}
 
 	// corro el código que resuelve el pageRank
@@ -448,7 +428,7 @@ void TestSinLinksCatedra(){
 		int dest;
 		ent >> source;
 		ent >> dest;
-		insertarElemento(&W, dest - 1, source - 1, 1);
+		insertarElemento(W, dest - 1, source - 1, 1);
 	}
 
 	// corro el código que resuelve el pageRank
@@ -473,7 +453,7 @@ void TestTrivialCatedra(){
 		int dest;
 		ent >> source;
 		ent >> dest;
-		insertarElemento(&W, dest - 1, source - 1, 1);
+		insertarElemento(W, dest - 1, source - 1, 1);
 	}
 
 	// corro el código que resuelve el pageRank
@@ -483,9 +463,9 @@ void TestTrivialCatedra(){
 int main(){
 	srand(time(NULL));
 	// TestEcuaciones();
-	//TestSolveLinearEquatinos();
+	TestSolveLinearEquatinos();
 	//TestGeneradores(7);
-	// TestEliminacionGaussiana();
+	//TestEliminacionGaussiana();
 	//Test1ParaSuma();
 	//Test1ParaMultPorEsc();
 	// TestAleatorioDesordenadoCatedra();
