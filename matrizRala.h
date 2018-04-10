@@ -196,7 +196,6 @@ void multiplicacionMatricial(Rala& A, Rala& B, Rala& C){
 		for(int j = 0 ; j < n ; j ++){
 			unordered_map<int,double>* filA = A.conex[i];
 			unordered_map<int,double>* colB = transp.conex[j];
-
 			double multRes = multiplicarFilas(filA, colB, n);
 			if(multRes != 0 ){
 				insertarElemento(C,i,j,multRes);
@@ -206,7 +205,7 @@ void multiplicacionMatricial(Rala& A, Rala& B, Rala& C){
 }
 
 // multiplica a la matriz por un vector columna (devuelve un vector columna como resultado)
-vector<double> replicarMovimientosEnVector(Rala& A, vector<double>* v){
+void replicarMovimientosEnVector(Rala& A, vector<double>* v){
 	int n = A.n ;
 	vector<double> res (n);
 	for(int i = 0; i < n; i ++){
@@ -215,13 +214,8 @@ vector<double> replicarMovimientosEnVector(Rala& A, vector<double>* v){
 		for(unordered_map<int,double>::iterator it  = row->begin(); it != row->end(); it++){
 			ac += (it->second) * (*v)[it->first];
 		}
-              (*v)[i] = ac;
-  		}
-	for(int i = 0 ; i < n ; i ++){
-	    res[i] = (*v)[i];
-    }
-
-	return res;
+        (*v)[i] = ac;
+  	}
 }
 
 // A = A*valor
@@ -298,21 +292,14 @@ int firstIndexWithValueDifferentThatZeroFrom(unordered_map<int,double>* m, int i
 void eliminacionGaussiana(Rala & A, Rala & Linv){
 	int n = A.n ;
 	for(int i = 0  ; i < n ; i ++){
-		int filaMax = maxIndexInMapFromKey(A, i, A.n); // se usa para saber si en la columna son todos ceros o no
-		if(filaMax != -1){
-			// transformar los ceros y hago las restas correspondientes (Ejemplo: F2 = F2 - 3F1)	
-			unordered_map<int,double>* pivot = A.conex[i];
+		// transformar los ceros y hago las restas correspondientes (Ejemplo: F2 = F2 - 3F1)	
+		unordered_map<int,double>* pivot = A.conex[i];
 
-			for(int j = i+1; j < A.n ; j++){
-				unordered_map<int,double> * row = A.conex[j];
-				if(row -> find(i) != row->end()){
-					reduceRowFromPivot(row,pivot, j, i ,n, Linv); // realiza resta de filas
-				}
+		for(int j = i+1; j < A.n ; j++){
+			unordered_map<int,double> * row = A.conex[j];
+			if(row -> find(i) != row->end()){
+				reduceRowFromPivot(row,pivot, j, i ,n, Linv); // realiza resta de filas
 			}
-		}else{
-			cout << "Capo, esta matriz no tiene fact LU, no puedo aplicarle EG. Rescatate amigo" << endl;
-			cout << "Voy a tener que tirar un break por esta flasheada" << endl;
-			break;
 		}
 	}
 }
@@ -366,6 +353,16 @@ void solveLinearEquations(Rala& A, vector<double> & conjunta, vector<double> & r
 	Rala L = CrearIdentidad(n);
 	eliminacionGaussiana(A, L);
 	replicarMovimientosEnVector(L, &conjunta);
+
+	cout << "Matriz a igualar " << endl;
+	mostrarRala(A);
+
+	cout << "Matriz L : " << endl;
+	mostrarRala(L);
+
+	cout << "Conjunta :" << endl;
+	mostrarVectorEnteros(conjunta);
+
 
 	for(int i = n-1; i >= 0 ; i --){
 		double ac = conjunta [i];
