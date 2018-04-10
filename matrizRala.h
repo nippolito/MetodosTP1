@@ -260,16 +260,14 @@ void MostrarMapaOrdeandamente(unordered_map<int,double>* m, int n){
 // pasás la fila y columna donde está el pivote (fila sirve para modificar Linv)
 // así como la fila entera del pivote (pivot) y la fila entera a modificar (row)
 // la columna te sirve para saber dónde comenzar la resta de filas 
-void reduceRowFromPivot(unordered_map<int,double>* row, unordered_map<int,double>* pivot, int fila, int col, int n, Rala & Linv){
+void reduceRowFromPivot(unordered_map<int,double>* row, unordered_map<int,double>* pivot, int fila, int col, int n, vector<double> & conjunta){
 	unordered_map<int,double>::iterator itPivot = pivot->find(col);
 	unordered_map<int,double>::iterator itRow = row->find(col);
 	double pivotBase = itPivot->second;
 	double rowBase = itRow->second;
 	double coeficiente = rowBase / pivotBase;
 	//cout << "EL COEFICIENTE ES : " << coeficiente << endl;
-
-	
-	insertarElemento(Linv, fila, col, coeficiente * -1);
+	conjunta[fila] -=  conjunta[col] * coeficiente; 
 
 	for(int i = col; i < n ; i++  ){
 		itRow = row->find(i);
@@ -305,7 +303,7 @@ int firstIndexWithValueDifferentThatZeroFrom(unordered_map<int,double>* m, int i
 // si le pasamos una matriz en la que NO se puede aplicar EG es probable que explote
 // pues el pivote por ahí es cero, pero hay otro número en la columna distinto de 0, 
 // por lo que maxIndexInMapFromKey no devuelve -1, y el algoritmo sigue y termina dividiendo por 0.
-void eliminacionGaussiana(Rala & A, Rala & Linv){
+void eliminacionGaussiana(Rala & A, vector<double> & conjunta){
 	int n = A.n ;
 	for(int col = 0  ; col < n ; col ++){
 		// transformar los ceros y hago las restas correspondientes (Ejemplo: F2 = F2 - 3F1)	
@@ -314,7 +312,7 @@ void eliminacionGaussiana(Rala & A, Rala & Linv){
 		for(int j = col+1; j < A.n ; j++){
 			unordered_map<int,double> * row = A.conex[j];
 			if(row -> find(col) != row->end()){
-				reduceRowFromPivot(row,pivot, j, col ,n, Linv); // realiza resta de filas
+				reduceRowFromPivot(row,pivot, j, col ,n, conjunta); // realiza resta de filas
 			}
 		}
 	}
@@ -366,9 +364,7 @@ void eliminacionGaussiana(Rala & A, Rala & Linv){
 // Resuelve la ecuación lineal A*res = conjunta
 // Devuelve el resultado en res (que vendría a ser el vector x)
 void solveLinearEquations(Rala& A, vector<double> & conjunta, vector<double> & res , int n ){
-	Rala L = CrearIdentidad(n);
-	eliminacionGaussiana(A, L);
-	replicarMovimientosEnVector(L, &conjunta);
+	eliminacionGaussiana(A, conjunta);
 /*
 	cout << "Matriz a igualar " << endl;
 	mostrarRala(A);

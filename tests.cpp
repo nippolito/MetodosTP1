@@ -189,18 +189,19 @@ void TestEliminacionGaussiana(){
 	insertarElemento(A, 2, 1, 2);
 	insertarElemento(A, 2, 2, 4);
 
+	vector<double> b;
+	b.push_back(17);
+	b.push_back(23);
+	b.push_back(16);
 
 
 
 	cout << "Matriz A original:" << endl;
 	mostrarRala(A);
 
-	eliminacionGaussiana(A, Linv);
+	eliminacionGaussiana(A, b);
 	cout<< "\nMatriz A con EG: " << endl;
 	mostrarRala(A);
-
-	cout << "\nMatriz L-Inv: "<< endl;
-	mostrarRala(Linv);
 }
 
 void TestSolveLinearEquatinos(){
@@ -463,7 +464,7 @@ void TestTrivialCatedra(){
 int main(){
 	srand(time(NULL));
 	// TestEcuaciones();
-	TestSolveLinearEquatinos();
+	Test15SegCatedra();
 	//TestGeneradores(7);
 	//TestEliminacionGaussiana();
 	//Test1ParaSuma();
