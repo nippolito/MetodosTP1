@@ -244,6 +244,18 @@ int maxIndexInMapFromKey(Rala& r, int col, int n ){
 	return maxIndex;
 }
 
+void MostrarMapaOrdeandamente(unordered_map<int,double>* m, int n){
+	cout << "[";
+	for(int i = 0; i < n ; i ++ ){
+		if(m->find(i) != m -> end()){
+			cout << m->find(i) -> second << ", ";
+		}else{
+			cout << "0, ";
+		}
+	}
+	cout << "]" << endl;
+}
+
 // realiza la resta de filas en eliminación gausseana (Ejemplo: F3 = F3 - 2F1)
 // pasás la fila y columna donde está el pivote (fila sirve para modificar Linv)
 // así como la fila entera del pivote (pivot) y la fila entera a modificar (row)
@@ -255,22 +267,26 @@ void reduceRowFromPivot(unordered_map<int,double>* row, unordered_map<int,double
 	double rowBase = itRow->second;
 	double coeficiente = rowBase / pivotBase;
 	//cout << "EL COEFICIENTE ES : " << coeficiente << endl;
+
 	
 	insertarElemento(Linv, fila, col, coeficiente * -1);
-	
-	// ciclo que realiza la resta de filas correctamente. Siempre comenzando desde la columna del pivote
-	for(unordered_map<int,double>::iterator it = itPivot; it != pivot -> end(); it ++){
-		itRow = row->find(it->first);
-		if(itRow != row -> end()){
-			if( (itRow -> second) - coeficiente * (it -> second ) != 0 ){
-				itRow -> second = (itRow -> second) - coeficiente * (it -> second );
+
+	for(int i = col; i < n ; i++  ){
+		itRow = row->find(i);
+		unordered_map<int,double>::iterator it = pivot -> find(i);
+		if(it != pivot -> end()){
+			if(itRow != row -> end()){
+				if( (itRow -> second) - coeficiente * (it -> second ) != 0 ){
+					itRow -> second = (itRow -> second) - coeficiente * (it -> second );
+				}else{
+					row->erase(itRow);
+				}
 			}else{
-				row->erase(itRow);
+				row -> insert(pair<int,double>(it->first, -1 * (it->second) * coeficiente));
 			}
-		}else{
-			row -> insert(pair<int,double>(it->first, -1 * (it->second) * coeficiente));
 		}
 	}
+
 }
 
 int firstIndexWithValueDifferentThatZeroFrom(unordered_map<int,double>* m, int i, int n){
@@ -291,14 +307,14 @@ int firstIndexWithValueDifferentThatZeroFrom(unordered_map<int,double>* m, int i
 // por lo que maxIndexInMapFromKey no devuelve -1, y el algoritmo sigue y termina dividiendo por 0.
 void eliminacionGaussiana(Rala & A, Rala & Linv){
 	int n = A.n ;
-	for(int i = 0  ; i < n ; i ++){
+	for(int col = 0  ; col < n ; col ++){
 		// transformar los ceros y hago las restas correspondientes (Ejemplo: F2 = F2 - 3F1)	
-		unordered_map<int,double>* pivot = A.conex[i];
+		unordered_map<int,double>* pivot = A.conex[col];
 
-		for(int j = i+1; j < A.n ; j++){
+		for(int j = col+1; j < A.n ; j++){
 			unordered_map<int,double> * row = A.conex[j];
-			if(row -> find(i) != row->end()){
-				reduceRowFromPivot(row,pivot, j, i ,n, Linv); // realiza resta de filas
+			if(row -> find(col) != row->end()){
+				reduceRowFromPivot(row,pivot, j, col ,n, Linv); // realiza resta de filas
 			}
 		}
 	}
@@ -353,7 +369,7 @@ void solveLinearEquations(Rala& A, vector<double> & conjunta, vector<double> & r
 	Rala L = CrearIdentidad(n);
 	eliminacionGaussiana(A, L);
 	replicarMovimientosEnVector(L, &conjunta);
-
+/*
 	cout << "Matriz a igualar " << endl;
 	mostrarRala(A);
 
@@ -363,7 +379,7 @@ void solveLinearEquations(Rala& A, vector<double> & conjunta, vector<double> & r
 	cout << "Conjunta :" << endl;
 	mostrarVectorEnteros(conjunta);
 
-
+*/
 	for(int i = n-1; i >= 0 ; i --){
 		double ac = conjunta [i];
 		for(int j = n-1 ; j > i ; j --){
