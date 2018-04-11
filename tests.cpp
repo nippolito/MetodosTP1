@@ -258,7 +258,12 @@ void TestEcuaciones(){
 	}	
 }
 
-
+// Tiempos según p? Resultados según p (bajo el mismo grafo)?
+// Tiempos según la granularidad de la matriz (i.e la cantidad de ceros)?
+// Resultados en casos específicos?
+// Cuánto explota nuestra struct el hecho de que sean ralas en casos de matrices aleatorias edd?
+// 		> Podemos ver cuántos ceros se encuentra en cada columna al hacer EG
+// 		> Podemos ver cuántos ceros se encuentra al iterar principalmente por el pivote y no por la fila en particular (en la resta de filas) 
 
 
 //-------------------------------------------------------------TESTS CÁTEDRA
@@ -267,7 +272,7 @@ void TestEcuaciones(){
 void Test15SegCatedra(){
 	// levanto los archivos
 	fstream ent ("Enunciado/tests_tp1/test_15_segundos.txt", ios::in);
-	fstream sal ("salida_test_15_seg.txt", ios::out);
+	fstream sal ("salida_test_15_seg_ReduceRow2.txt", ios::out);
 
 	//creo la matriz rala
 	int n;
@@ -667,15 +672,15 @@ int main(){
 	//Test1ParaSuma();
 	//Test1ParaMultPorEsc();
 	// TestAleatorioDesordenadoCatedra();
-	// Test15SegCatedra();
+	Test15SegCatedra();
 	// Test30SegCatedra();
 	// compararResultados15Segs();
 	// compararResultados30Segs();
-	TestAleatorioCatedra();
-	TestAleatorioDesordenadoCatedra();
-	TestCompleto();
-	TestSinLinksCatedra();
-	TestTrivialCatedra();
+	// TestAleatorioCatedra();
+	// TestAleatorioDesordenadoCatedra();
+	// TestCompleto();
+	// TestSinLinksCatedra();
+	// TestTrivialCatedra();
 
 	return 0;
 }

@@ -229,8 +229,8 @@ void multiplicacionPorEscalar(Rala& A, double valor){
 // así como la fila entera del pivote (pivot) y la fila entera a modificar (row)
 // la columna te sirve para saber dónde comenzar la resta de filas 
 void reduceRowFromPivot(map<int,double>* row, map<int,double>* pivot, int fila, int col, int n, vector<double> & conjunta){
-	map<int,double>::iterator itPivot = pivot->find(col);
-	map<int,double>::iterator itRow = row->find(col);
+	map<int,double>::iterator itPivot = pivot->find(col); // siempre lo encuentra pues la matriz es inversible
+	map<int,double>::iterator itRow = row->find(col);	// siempre lo encuentra pues el código de EG evita llamar a esta función si no lo hace
 	double pivotBase = itPivot->second;
 	double rowBase = itRow->second;
 	double coeficiente = rowBase / pivotBase;
@@ -238,13 +238,18 @@ void reduceRowFromPivot(map<int,double>* row, map<int,double>* pivot, int fila, 
 	conjunta[fila] -=  conjunta[col] * coeficiente; 
 
 	while(itPivot != pivot->end() ){
+		// recorro la fila del pivote pues si hay un cero en una columna, no hay que hacer nada
 		if( itRow == row->end()){
+			// si llegaste al final de la fila que estabas modificando, entonces hubo varios ceros antes
+			// que ahora vas a tener que modificar
 			for(;itPivot != pivot ->end(); itPivot ++){
 				row -> insert(pair<int,double>(itPivot->first, -1 * (itPivot->second) * coeficiente));
 			}
 		}
 		else{
 			if(itRow -> first == itPivot -> first){
+				// si están ambos en la misma col, realizo los cálculos
+				// (en que va a ser modificado puede volverse cero, en ese caso lo borro)
 				std::map<int, double>::iterator itAux = itRow;
 				itAux ++;
 				if( abs((itRow -> second) - coeficiente * (itPivot -> second )) > 0  ){
@@ -266,17 +271,18 @@ void reduceRowFromPivot(map<int,double>* row, map<int,double>* pivot, int fila, 
 	}
 }
 
+
 //--------------------------------------------------------ELIMINACIÓN GAUSSIANA + CÁLCULO PAGERANK
+
 
 // esta es EG común (sin pivoteo)
 // modifica la matriz de entrada A, y en Linv guarda lo que sería L de la fact LU (pero multiplicado por -1)
-// Precondición >>>> asumimos que le pasamos matrices en las que se puede aplicar EG
-// si le pasamos una matriz en la que NO se puede aplicar EG es probable que explote
-// pues el pivote por ahí es cero, pero hay otro número en la columna distinto de 0, 
-// por lo que maxIndexInMapFromKey no devuelve -1, y el algoritmo sigue y termina dividiendo por 0.
+// Precondición >>>> asumimos que le pasamos matrices en las que se puede aplicar EG (pues por TP eso vale siempre)
 void eliminacionGaussiana(Rala & A, vector<double> & conjunta){
 	int n = A.n ;
 	for(int col = 0  ; col < n ; col ++){
+		cout << "vamos por la col: ";
+		cout << col << endl;
 		// transformar los ceros y hago las restas correspondientes (Ejemplo: F2 = F2 - 3F1)	
 		map<int,double>* pivot = A.conex[col];
 
