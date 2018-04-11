@@ -247,7 +247,7 @@ void reduceRowFromPivot(map<int,double>* row, map<int,double>* pivot, int fila, 
 			if(itRow -> first == itPivot -> first){
 				std::map<int, double>::iterator itAux = itRow;
 				itAux ++;
-				if( ((itRow -> second) - coeficiente * (itPivot -> second )) > 0  ){
+				if( abs((itRow -> second) - coeficiente * (itPivot -> second )) > 0  ){
 					itRow -> second = (itRow -> second) - coeficiente * (itPivot -> second );
 				}else{
 					row->erase(itRow);

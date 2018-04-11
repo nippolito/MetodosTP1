@@ -579,10 +579,10 @@ int main(){
 	//Test1ParaSuma();
 	//Test1ParaMultPorEsc();
 	// TestAleatorioDesordenadoCatedra();
-	// Test15SegCatedra();
-	// Test30SegCatedra();
-	// compararResultados15Segs();
-	// compararResultados30Segs();
+	Test15SegCatedra();
+	Test30SegCatedra();
+	compararResultados15Segs();
+	compararResultados30Segs();
 
 	return 0;
 }
