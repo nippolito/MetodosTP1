@@ -3,20 +3,22 @@
 #include <math.h>
 #include <vector>
 #include <utility> // para pair
-#include <unordered_map>
+#include <map>
 #include <cmath> 
 
 using namespace std;
+
+double epsilon = 0.000000000001;
 
 class Rala{
 public:
 	Rala(int size ){
 		n = size;
 
-		vector< unordered_map<int, double>* > conecciones (n, NULL);
+		vector< map<int, double>* > conecciones (n, NULL);
 
 		for(int i = 0 ; i < n ; i ++){
-			conecciones[i] = new unordered_map<int,double> ();
+			conecciones[i] = new map<int,double> ();
 		}
 
 		conex = conecciones;
@@ -29,9 +31,7 @@ public:
 	}
 
 	int n;
-	vector< unordered_map<int, double>* > conex; // lista de adyacencia. 
-
-	vector< unordered_map<int, double>* > transp; // transpuesta
+	vector< map<int, double>* > conex; // lista de adyacencia. 
 	// uso pair ya que necesitamos saber la columna a la que corresponde cada elemento para elimGauss
 	// pair.first = elemento, pair.second = columna
 
@@ -40,12 +40,11 @@ public:
 
 // inserta elemento en la matriz A.
 void insertarElemento(Rala& A, int fila, int columna, double valor ){
-	
-	unordered_map<int,double>::iterator it = A.conex[fila] -> find(columna);
-	if( it != A.conex[fila] -> end() ){
-		it -> second = valor;
+	map<int,double>::iterator it = A.conex[fila] -> find(columna);
+	if( it == A.conex[fila] -> end() ){
+		A.conex[fila] -> insert(pair<int,double>(columna,valor));			
 	}else{
-		A.conex[fila] -> insert(pair<int,double>(columna,valor));	
+		it -> second = valor;
 	}
 }
 
@@ -77,11 +76,11 @@ void mostrarVectorEnteros(vector<double> v ){
 }
 
 
-void mostrarVectorPair(unordered_map<int,double>* m, int n){
+void mostrarVectorPair(map<int,double>* m, int n){
 	// cout << "longitud de vec: " << vec.size() << endl;
 	cout << "[";
 	for(int i =  0 ; i < n ; i ++){
-		unordered_map<int,double>::iterator it = m -> find(i);
+		map<int,double>::iterator it = m -> find(i);
 		string comaOrEnd = i == n-1 ? "" : ", "; 
 		if(it != m->end()){
 			cout <<  it -> second << comaOrEnd;
@@ -140,7 +139,7 @@ Rala CrearIdentidad(int n ){
 void createTranspose(Rala& A, Rala& At){
 	int n = A.n;
 	for(int i = 0; i < n ; i ++){
-		for(unordered_map<int,double>::iterator it = A.conex[i] -> begin() ; it != (A.conex[i]) -> end(); it ++){
+		for(map<int,double>::iterator it = A.conex[i] -> begin() ; it != (A.conex[i]) -> end(); it ++){
 			insertarElemento(At, i, it->first, it -> second);
 		}
 	}
@@ -151,23 +150,30 @@ void createTranspose(Rala& A, Rala& At){
 
 
 // suma las matrices A y B y devuelve la suma en C
-void sumaMatricial(Rala & A, Rala & B, Rala & C){
+//Complejidad : O(n^2)
+void sumaMatricial(Rala& A, Rala& B, Rala& C){ 
 	int n = A.n;
 	for(int i = 0; i < n; i++){
-		unordered_map<int, double>* filA = A.conex[i];
-		unordered_map<int, double>* filB = B.conex[i];
-		for(int j = 0 ; j < n; j++){
-			unordered_map<int, double>::iterator itA = filA->find(j) ;
-			unordered_map<int, double>::iterator itB = filB->find(j) ;
+		map<int, double>* filA = A.conex[i];
+		map<int, double>* filB = B.conex[i];
 
-			if(itA != filA -> end() && itB == filB -> end()){
-				insertarElemento(C, i, j, itA->second);
+		map<int, double>::iterator itA = filA->begin();
+		map<int, double>::iterator itB = filB->begin();
+		
+
+		while(itA != filA->end() || itB != filB->end()){
+			if( itB == filB->end()  ||  ((itA -> first < itB -> first) && itA != filA->end()) ){
+				insertarElemento(C, i, itA->first, itA->second);
+				itA ++;
 			}
-			else if(itA == filA -> end() && itB != filB -> end()){
-				insertarElemento(C, i, j, itB->second);
+			else if( itA == filA->end() || ((itA -> first > itB -> first) && itB != filB->end()) ){
+				insertarElemento(C, i, itB->first, itB->second);
+				itB ++;
 			}
-			else if(itA != filA -> end() && itB != filB -> end()){
-				insertarElemento(C, i, j, itA->second + itB->second);
+			else{
+				insertarElemento(C, i, itA->first, itA->second + itB -> second);
+				itA ++;
+				itB ++;
 			}
 		}
 	}
@@ -175,125 +181,90 @@ void sumaMatricial(Rala & A, Rala & B, Rala & C){
 
 // auxiliar para la multiplicación matricial
 // utilizada para obtener el elemento C_filAcolB de la multiplicación entre A y B
-double multiplicarFilas(unordered_map<int,double>* fila, unordered_map<int,double>* col, int n){
+// Complejidad  O(n * log(n))
+double multiplicarFilas(map<int,double>* fila, map<int,double>* col, int n){
 	double ac = 0;
-	for(int i = 0 ; i < n ; i ++){
-		unordered_map<int, double>::iterator itF = fila -> find(i);
-		unordered_map<int, double>::iterator itC = col  -> find(i);
-		if(itF != fila -> end() && itC != col -> end()){
+
+	for(map<int, double>::iterator itF = fila -> begin(); itF != fila -> end(); itF ++){
+		map<int, double>::iterator itC = col  -> find(itF -> first);
+		if(itC != col -> end() ){
 			ac += itF->second * itC -> second;
 		} 
 	}
+
 	return ac;
 }
 
 // multiplica las matrices A y B. Devuelve la multiplicación en C
+// COMPLEJIDAD O(n^3)
 void multiplicacionMatricial(Rala& A, Rala& B, Rala& C){
 	int n = A.n;
 	Rala transp = Rala(n);
 	createTranspose(B, transp);
 	for(int i = 0; i < n; i++){
 		for(int j = 0 ; j < n ; j ++){
-			unordered_map<int,double>* filA = A.conex[i];
-			unordered_map<int,double>* colB = transp.conex[j];
+			map<int,double>* filA = A.conex[i];
+			map<int,double>* colB = transp.conex[j];
 			double multRes = multiplicarFilas(filA, colB, n);
-			if(multRes != 0 ){
+			if(abs(multRes) > 0 ){
 				insertarElemento(C,i,j,multRes);
 			}
 		}
 	}
 }
 
-// multiplica a la matriz por un vector columna (devuelve un vector columna como resultado)
-void replicarMovimientosEnVector(Rala& A, vector<double>* v){
-	int n = A.n ;
-	vector<double> res (n);
-	for(int i = 0; i < n; i ++){
-		unordered_map<int,double>* row = A.conex[i];
-		double ac = 0.0 ;
-		for(unordered_map<int,double>::iterator it  = row->begin(); it != row->end(); it++){
-			ac += (it->second) * (*v)[it->first];
-		}
-        (*v)[i] = ac;
-  	}
-}
-
 // A = A*valor
 // modifica A
 void multiplicacionPorEscalar(Rala& A, double valor){
 	for (int i = 0; i < A.conex.size(); i++){
-		for(unordered_map<int,double>::iterator it = (A.conex[i])->begin(); it != (A.conex[i])->end(); it++){
+		for(map<int,double>::iterator it = (A.conex[i])->begin(); it != (A.conex[i])->end(); it++){
 			it -> second *= valor;
 		}
 	}
 }
 
-// devuelve el elemento de abs máximo que haya en la columna, considerando las filas col <= fila < n
-int maxIndexInMapFromKey(Rala& r, int col, int n ){
-	double maxIndex = -1;
-	double maxVal = 0;
-	for(int i = col; i < n; i++){
-		unordered_map<int,double>::iterator it =  r.conex[i]->find(col);
-		if( it != (r.conex[i])->end()){
-			if(abs(it->second) > abs(maxVal)){
-					maxVal = it->second;
-					maxIndex = i;			
-			}
-		}
-	}
-	return maxIndex;
-}
-
-void MostrarMapaOrdeandamente(unordered_map<int,double>* m, int n){
-	cout << "[";
-	for(int i = 0; i < n ; i ++ ){
-		if(m->find(i) != m -> end()){
-			cout << m->find(i) -> second << ", ";
-		}else{
-			cout << "0, ";
-		}
-	}
-	cout << "]" << endl;
-}
 
 // realiza la resta de filas en eliminación gausseana (Ejemplo: F3 = F3 - 2F1)
 // pasás la fila y columna donde está el pivote (fila sirve para modificar Linv)
 // así como la fila entera del pivote (pivot) y la fila entera a modificar (row)
 // la columna te sirve para saber dónde comenzar la resta de filas 
-void reduceRowFromPivot(unordered_map<int,double>* row, unordered_map<int,double>* pivot, int fila, int col, int n, vector<double> & conjunta){
-	unordered_map<int,double>::iterator itPivot = pivot->find(col);
-	unordered_map<int,double>::iterator itRow = row->find(col);
+void reduceRowFromPivot(map<int,double>* row, map<int,double>* pivot, int fila, int col, int n, vector<double> & conjunta){
+	map<int,double>::iterator itPivot = pivot->find(col);
+	map<int,double>::iterator itRow = row->find(col);
 	double pivotBase = itPivot->second;
 	double rowBase = itRow->second;
 	double coeficiente = rowBase / pivotBase;
-	//cout << "EL COEFICIENTE ES : " << coeficiente << endl;
+	
 	conjunta[fila] -=  conjunta[col] * coeficiente; 
 
-	for(int i = col; i < n ; i++  ){
-		itRow = row->find(i);
-		unordered_map<int,double>::iterator it = pivot -> find(i);
-		if(it != pivot -> end()){
-			if(itRow != row -> end()){
-				if( (itRow -> second) - coeficiente * (it -> second ) != 0 ){
-					itRow -> second = (itRow -> second) - coeficiente * (it -> second );
+	while(itPivot != pivot->end() ){
+		if( itRow == row->end()){
+			for(;itPivot != pivot ->end(); itPivot ++){
+				row -> insert(pair<int,double>(itPivot->first, -1 * (itPivot->second) * coeficiente));
+			}
+		}
+		else{
+			if(itRow -> first == itPivot -> first){
+				std::map<int, double>::iterator itAux = itRow;
+				itAux ++;
+				if( ((itRow -> second) - coeficiente * (itPivot -> second )) > 0  ){
+					itRow -> second = (itRow -> second) - coeficiente * (itPivot -> second );
 				}else{
 					row->erase(itRow);
 				}
-			}else{
-				row -> insert(pair<int,double>(it->first, -1 * (it->second) * coeficiente));
+				itPivot ++;
+				itRow = itAux; 
+			}
+			else if (itRow -> first > itPivot -> first) {
+				row -> insert(pair<int,double>(itPivot->first, -1 * (itPivot->second) * coeficiente));
+				itPivot ++;
+			}
+			else if (itRow -> first < itPivot -> first) {
+				itRow ++;
 			}
 		}
 	}
-
 }
-
-int firstIndexWithValueDifferentThatZeroFrom(unordered_map<int,double>* m, int i, int n){
-	for(int j = i ; j < n ; j ++){
-		if(m->find(j) != m->end()) return j;
-	}
-	return -1;
-}
-
 
 //--------------------------------------------------------ELIMINACIÓN GAUSSIANA + CÁLCULO PAGERANK
 
@@ -307,10 +278,10 @@ void eliminacionGaussiana(Rala & A, vector<double> & conjunta){
 	int n = A.n ;
 	for(int col = 0  ; col < n ; col ++){
 		// transformar los ceros y hago las restas correspondientes (Ejemplo: F2 = F2 - 3F1)	
-		unordered_map<int,double>* pivot = A.conex[col];
+		map<int,double>* pivot = A.conex[col];
 
 		for(int j = col+1; j < A.n ; j++){
-			unordered_map<int,double> * row = A.conex[j];
+			map<int,double> * row = A.conex[j];
 			if(row -> find(col) != row->end()){
 				reduceRowFromPivot(row,pivot, j, col ,n, conjunta); // realiza resta de filas
 			}
@@ -328,24 +299,24 @@ void eliminacionGaussiana(Rala & A, vector<double> & conjunta){
 		int filaMax = maxIndexInMapFromKey(&A, i, A.n);
 		if(filaMax != -1){
 			//--------------------  Reacomodar posiciones.
-			unordered_map<int,double> * unordered_mapTempA = (A.conex)[i];
-			unordered_map<int,double> * unordered_mapTempL = (Linv.conex)[i];
-			unordered_map<int,double> * unordered_mapTempP = (Linv.conex)[i];
+			map<int,double> * mapTempA = (A.conex)[i];
+			map<int,double> * mapTempL = (Linv.conex)[i];
+			map<int,double> * mapTempP = (Linv.conex)[i];
 			
 			
 			(A.conex)[i] = (A.conex)[filaMax];
-			(A.conex)[filaMax] = unordered_mapTempA;
+			(A.conex)[filaMax] = mapTempA;
 
 			(Linv.conex)[i] = (Linv.conex)[filaMax];
-			(Linv.conex)[filaMax] = unordered_mapTempL;
+			(Linv.conex)[filaMax] = mapTempL;
 
 			(Permu.conex)[i] = (Permu.conex)[filaMax];
-			(Permu.conex)[filaMax] = unordered_mapTempL;
+			(Permu.conex)[filaMax] = mapTempL;
 			//-------------------- 	transformar los ceros y hago las restas correspondientes
-			unordered_map<int,double>* pivot = A.conex[i];
+			map<int,double>* pivot = A.conex[i];
 
 			for(int j = i+1; j < A.n ; j++){
-				unordered_map<int,double> * row = A.conex[j];
+				map<int,double> * row = A.conex[j];
 				if(row -> find(i) != row->end()){
 					reduceRowFromPivot(row,pivot, j, i ,n, &Linv);
 				}
@@ -365,21 +336,11 @@ void eliminacionGaussiana(Rala & A, vector<double> & conjunta){
 // Devuelve el resultado en res (que vendría a ser el vector x)
 void solveLinearEquations(Rala& A, vector<double> & conjunta, vector<double> & res , int n ){
 	eliminacionGaussiana(A, conjunta);
-/*
-	cout << "Matriz a igualar " << endl;
-	mostrarRala(A);
 
-	cout << "Matriz L : " << endl;
-	mostrarRala(L);
-
-	cout << "Conjunta :" << endl;
-	mostrarVectorEnteros(conjunta);
-
-*/
 	for(int i = n-1; i >= 0 ; i --){
 		double ac = conjunta [i];
 		for(int j = n-1 ; j > i ; j --){
-			unordered_map<int,double>::iterator it2  = (A.conex[i]) -> find(j);
+			map<int,double>::iterator it2  = (A.conex[i]) -> find(j);
 			if(it2 != (A.conex[i])->end() ){
 				ac -= (res[j] * (it2 -> second));	
 			}
@@ -396,9 +357,7 @@ void resolverPageRank(Rala& W, vector<double>& res, double p){
 	Rala WxDxp = Rala(n);
 	Rala MatrizAIgualar = Rala(n);
 	Rala I = CrearIdentidad(n);
-	Rala I2 = CrearIdentidad(n);
 	Rala D  = Rala(n);
-	Rala L = CrearIdentidad(n);
 	vector<double> e = generarVectorE(n);	//Creo e 
 
 	double prob = p * (-1); //uso -p para poder multiplicar directamente y luego usar sumaMatricial.

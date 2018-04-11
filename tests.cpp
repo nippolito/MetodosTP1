@@ -464,7 +464,7 @@ void TestTrivialCatedra(){
 int main(){
 	srand(time(NULL));
 	// TestEcuaciones();
-	Test15SegCatedra();
+	TestSolveLinearEquatinos();
 	//TestGeneradores(7);
 	//TestEliminacionGaussiana();
 	//Test1ParaSuma();
