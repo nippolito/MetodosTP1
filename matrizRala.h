@@ -85,7 +85,7 @@ void mostrarVectorPair(map<int,double>* m, int n){
 		if(it != m->end()){
 			cout <<  it -> second << comaOrEnd;
 		}else{
-			cout <<"0" << comaOrEnd;
+			cout << "0" << comaOrEnd;
 		}
 	}
 	cout << "]" << endl;
@@ -181,15 +181,20 @@ void sumaMatricial(Rala& A, Rala& B, Rala& C){
 
 // auxiliar para la multiplicación matricial
 // utilizada para obtener el elemento C_filAcolB de la multiplicación entre A y B
-// Complejidad  O(n * log(n))
+// Complejidad  O(n )
 double multiplicarFilas(map<int,double>* fila, map<int,double>* col, int n){
 	double ac = 0;
+	map<int, double>::iterator itF = fila -> begin();
+	map<int, double>::iterator itC = col  -> begin();
 
-	for(map<int, double>::iterator itF = fila -> begin(); itF != fila -> end(); itF ++){
-		map<int, double>::iterator itC = col  -> find(itF -> first);
-		if(itC != col -> end() ){
+	while(itF != fila -> end() && itC != col  -> end()){
+		if(itF -> first < itC ->first) itF++;
+		else if(itC -> first < itF->first) itC ++;
+		else{
 			ac += itF->second * itC -> second;
-		} 
+			itC++;
+			itF++;
+		}
 	}
 
 	return ac;
@@ -338,14 +343,21 @@ void solveLinearEquations(Rala& A, vector<double> & conjunta, vector<double> & r
 	eliminacionGaussiana(A, conjunta);
 
 	for(int i = n-1; i >= 0 ; i --){
-		double ac = conjunta [i];
+		//double ac = conjunta [i];
+		double ac = 0 ;
 		for(int j = n-1 ; j > i ; j --){
 			map<int,double>::iterator it2  = (A.conex[i]) -> find(j);
 			if(it2 != (A.conex[i])->end() ){
-				ac -= (res[j] * (it2 -> second));	
+				ac += (res[j] * (it2 -> second));	
 			}
 		}
-		res[i] = ac / (A.conex[i])->find(i)->second;
+		double aux = conjunta[i] - ac ;
+		if(abs(aux) > 0 ){
+			res[i] = aux / (A.conex[i])->find(i)->second;
+		}
+		else {
+			res[i] = 0;
+		}
 	} 
 }
 

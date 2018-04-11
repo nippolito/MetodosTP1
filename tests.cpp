@@ -464,13 +464,13 @@ void TestTrivialCatedra(){
 int main(){
 	srand(time(NULL));
 	// TestEcuaciones();
-	TestSolveLinearEquatinos();
+	//TestSolveLinearEquatinos();
 	//TestGeneradores(7);
 	//TestEliminacionGaussiana();
 	//Test1ParaSuma();
 	//Test1ParaMultPorEsc();
 	// TestAleatorioDesordenadoCatedra();
-	// Test15SegCatedra();
+	 Test15SegCatedra();
 
 	return 0;
 }
