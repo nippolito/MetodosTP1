@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <chrono>
 #include "matrizRala.h"
 
 
@@ -257,18 +258,21 @@ void TestEcuaciones(){
 	}	
 }
 
+// Tiempos según p? Resultados según p (bajo el mismo grafo)?
+// Tiempos según la granularidad de la matriz (i.e la cantidad de ceros)?
+// Resultados en casos específicos?
+// Cuánto explota nuestra struct el hecho de que sean ralas en casos de matrices aleatorias edd?
+// 		> Podemos ver cuántos ceros se encuentra en cada columna al hacer EG
+// 		> Podemos ver cuántos ceros se encuentra al iterar principalmente por el pivote y no por la fila en particular (en la resta de filas) 
+
 
 //-------------------------------------------------------------TESTS CÁTEDRA
-// Falta medir bien tiempos para ver qué onda
-// Falta comparar con un script los resultados de la cátedra vs los nuestros
 
 
-// lo corrí y las primeras y últimas 100 lineas son iguales a los outs de la cátedra
-// no medí tiempos, pero habrá tardado en correrse (todo entero) entre 3 y 5 minutos
 void Test15SegCatedra(){
 	// levanto los archivos
 	fstream ent ("Enunciado/tests_tp1/test_15_segundos.txt", ios::in);
-	fstream sal ("salida_test_15_seg.txt", ios::out);
+	fstream sal ("salida_test_15_seg_ReduceRow2.txt", ios::out);
 
 	//creo la matriz rala
 	int n;
@@ -286,11 +290,20 @@ void Test15SegCatedra(){
 		insertarElemento(W, dest - 1, source - 1, 1);
 	}
 
-	// corro el código que resuelve el pageRank
+	// corro el código que resuelve el pageRank + mido tiempos
+
+	std::chrono::time_point<std::chrono::system_clock> start, end;
 
 	double p = 0.9;
 	vector<double> res(n, 0);
+	start = std::chrono::system_clock::now();
 	resolverPageRank(W, res, p);
+	end = std::chrono::system_clock::now();
+
+	std::chrono::duration<double, std::milli> elapsed_seconds = end-start;
+
+	cout << "el tiempo del de 15 segs fue: ";
+	cout << elapsed_seconds.count() << endl;
 
 
 	// guardo en el archivo de salida los resultados
@@ -298,6 +311,9 @@ void Test15SegCatedra(){
 	for(int i = 0; i < n; i++){
 		sal << res[i] << endl;
 	}
+
+	ent.close();
+	sal.close();
 }
 
 // no lo corrí ni terminé el código
@@ -323,6 +339,29 @@ void Test30SegCatedra(){
 	}
 
 	// corro el código que resuelve el pageRank
+
+	std::chrono::time_point<std::chrono::system_clock> start, end;
+
+	double p = 0.8;
+	vector<double> res(n, 0);
+	start = std::chrono::system_clock::now();
+	resolverPageRank(W, res, p);
+	end = std::chrono::system_clock::now();
+
+	std::chrono::duration<double, std::milli> elapsed_seconds = end-start;
+
+	cout << "el tiempo del de 30 segs fue: ";
+	cout << elapsed_seconds.count() << endl;
+
+
+	// guardo en el archivo de salida los resultados
+	sal << p << endl;
+	for(int i = 0; i < n; i++){
+		sal << res[i] << endl;
+	}
+
+	ent.close();
+	sal.close();
 }
 
 // no lo corrí ni terminé el código
@@ -348,6 +387,29 @@ void TestAleatorioCatedra(){
 	}
 
 	// corro el código que resuelve el pageRank
+
+	std::chrono::time_point<std::chrono::system_clock> start, end;
+
+	double p = 0.85;
+	vector<double> res(n, 0);
+	start = std::chrono::system_clock::now();
+	resolverPageRank(W, res, p);
+	end = std::chrono::system_clock::now();
+
+	std::chrono::duration<double, std::milli> elapsed_seconds = end-start;
+
+	cout << "el tiempo del test aleatorio fue: ";
+	cout << elapsed_seconds.count() << endl;
+
+
+	// guardo en el archivo de salida los resultados
+	sal << p << endl;
+	for(int i = 0; i < n; i++){
+		sal << res[i] << endl;
+	}
+
+	ent.close();
+	sal.close();
 }
 
 // este lo corrí y devuelve todo igual
@@ -374,15 +436,28 @@ void TestAleatorioDesordenadoCatedra(){
 
 	// corro el código que resuelve el pageRank
 
+	std::chrono::time_point<std::chrono::system_clock> start, end;
+
 	double p = 0.76;
 	vector<double> res(n, 0);
+	start = std::chrono::system_clock::now();
 	resolverPageRank(W, res, p);
+	end = std::chrono::system_clock::now();
+
+	std::chrono::duration<double, std::milli> elapsed_seconds = end-start;
+
+	cout << "el tiempo del test aleatorio_desordenado fue: ";
+	cout << elapsed_seconds.count() << endl;
+
 
 	// guardo en el archivo de salida los resultados
 	sal << p << endl;
 	for(int i = 0; i < n; i++){
 		sal << res[i] << endl;
 	}
+
+	ent.close();
+	sal.close();
 }
 
 // no lo corrí ni terminé el código
@@ -408,6 +483,29 @@ void TestCompleto(){
 	}
 
 	// corro el código que resuelve el pageRank
+
+	std::chrono::time_point<std::chrono::system_clock> start, end;
+
+	double p = 0.5;
+	vector<double> res(n, 0);
+	start = std::chrono::system_clock::now();
+	resolverPageRank(W, res, p);
+	end = std::chrono::system_clock::now();
+
+	std::chrono::duration<double, std::milli> elapsed_seconds = end-start;
+
+	cout << "el tiempo del test completo fue: ";
+	cout << elapsed_seconds.count() << endl;
+
+
+	// guardo en el archivo de salida los resultados
+	sal << p << endl;
+	for(int i = 0; i < n; i++){
+		sal << res[i] << endl;
+	}
+
+	ent.close();
+	sal.close();
 }
 
 // no lo corrí ni terminé el código
@@ -433,6 +531,29 @@ void TestSinLinksCatedra(){
 	}
 
 	// corro el código que resuelve el pageRank
+
+	std::chrono::time_point<std::chrono::system_clock> start, end;
+
+	double p = 0.64;
+	vector<double> res(n, 0);
+	start = std::chrono::system_clock::now();
+	resolverPageRank(W, res, p);
+	end = std::chrono::system_clock::now();
+
+	std::chrono::duration<double, std::milli> elapsed_seconds = end-start;
+
+	cout << "el tiempo del test sin links fue: ";
+	cout << elapsed_seconds.count() << endl;
+
+
+	// guardo en el archivo de salida los resultados
+	sal << p << endl;
+	for(int i = 0; i < n; i++){
+		sal << res[i] << endl;
+	}
+
+	ent.close();
+	sal.close();
 }
 
 // no lo corrí ni terminé el código
@@ -458,19 +579,108 @@ void TestTrivialCatedra(){
 	}
 
 	// corro el código que resuelve el pageRank
+
+	std::chrono::time_point<std::chrono::system_clock> start, end;
+
+	double p = 0.3;
+	vector<double> res(n, 0);
+	start = std::chrono::system_clock::now();
+	resolverPageRank(W, res, p);
+	end = std::chrono::system_clock::now();
+
+	std::chrono::duration<double, std::milli> elapsed_seconds = end-start;
+
+	cout << "el tiempo del test trivial fue: ";
+	cout << elapsed_seconds.count() << endl;
+
+
+	// guardo en el archivo de salida los resultados
+	sal << p << endl;
+	for(int i = 0; i < n; i++){
+		sal << res[i] << endl;
+	}
+
+	ent.close();
+	sal.close();
+}
+
+void compararResultados15Segs(){
+	double errorFinal;
+	fstream catedra ("Enunciado/tests_tp1/test_15_segundos.txt.out", ios::in);
+	fstream nuestro ("salida_test_15_seg.txt", ios::in);
+	fstream errores ("error_test_15_seg.txt", ios::out);
+
+	int p;
+	catedra >> p;
+	nuestro >> p;
+	for(int i = 0; i < 2001; i++){
+		double resICatedra;
+		double resINuestro;
+		catedra >> resICatedra;
+		nuestro >> resINuestro;
+		double errorI = fabs(resICatedra - resINuestro);
+		errorFinal += errorI;
+		errores << errorI << endl;
+	}
+
+	cout << errorFinal << endl;
+	errorFinal = errorFinal / 2000;
+	cout << "nuestro promedio de error en el de 15 segundos es es: ";
+	cout << errorFinal << endl;
+
+	catedra.close();
+	nuestro.close();
+	errores.close();
+}
+
+void compararResultados30Segs(){
+	double errorFinal;
+	fstream catedra ("Enunciado/tests_tp1/test_30_segundos.txt.out", ios::in);
+	fstream nuestro ("salida_test_30_seg.txt", ios::in);
+	fstream errores ("error_test_30_seg.txt", ios::out);
+
+	int p;
+	catedra >> p;
+	nuestro >> p;
+	for(int i = 0; i < 3000; i++){
+		double resICatedra;
+		double resINuestro;
+		catedra >> resICatedra;
+		nuestro >> resINuestro;
+		double errorI = fabs(resICatedra - resINuestro);
+		errorFinal += errorI;
+		errores << errorI << endl;
+	}
+
+	cout << errorFinal << endl;
+	errorFinal = errorFinal / 3000;
+	cout << "nuestro promedio de error en el de 30 segundos es: ";
+	cout << errorFinal << endl;
+
+	catedra.close();
+	nuestro.close();
+	errores.close();
 }
 
 
 int main(){
 	srand(time(NULL));
 	// TestEcuaciones();
+
 	//TestSolveLinearEquatinos();
+
+	// TestSolveLinearEquatinos();
+
 	//TestGeneradores(7);
 	//TestEliminacionGaussiana();
 	//Test1ParaSuma();
 	//Test1ParaMultPorEsc();
 	// TestAleatorioDesordenadoCatedra();
 	 Test15SegCatedra();
+	 compararResultados15Segs();
+
+	 Test30SegCatedra();
+	 compararResultados30Segs();
 
 	return 0;
 }
