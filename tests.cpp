@@ -118,9 +118,13 @@ void Test1ParaSuma(){ 	// pasa, todo OK
 	insertarElemento(B, 1, 1, 2);
 	insertarElemento(B, 2, 2, 3);
 
+	cout << "Matriz A" << endl;
+	mostrarRala(A);
+
+	cout << "Matriz B" << endl;
+	mostrarRala(B);
+
 	Rala C = Rala(A.n);
-	cout << "MATRIZ RESULTADO VACIA: " << endl;
-	mostrarRala(C);
 	sumaMatricial(A, B, C);
 	cout << "MATRIZ FINAL:" << endl;
 	mostrarRala(C);
@@ -135,18 +139,21 @@ void Test1ParaMult(){ 	// pasa, todo OK
 	insertarElemento(A, 1, 0, 2);
 	insertarElemento(A, 1, 1, 1);
 	insertarElemento(A, 2, 1, 2);
-	insertarElemento(B, 0, 0, 4);
+	insertarElemento(B, 0, 0, 1);
 	insertarElemento(B, 0, 1, 2);
 	insertarElemento(B, 1, 2, 1);
 	insertarElemento(B, 2, 0, 1);
 	insertarElemento(B, 2, 2, 3);
 
+	cout << "Matriz A" << endl;
 	mostrarRala(A);
+	cout << "Matriz B" << endl;
 	mostrarRala(B);
 
 	Rala C = Rala(A.n);
 	multiplicacionMatricial(A, B, C);
 	cout << endl;
+	cout << "MATRIZ FINAL:" << endl;
 	mostrarRala(C);	
 }
 
@@ -161,7 +168,7 @@ void Test1ParaMultPorEsc(){ 	// pasa, todo OK
 	cout << endl;
 	mostrarRala(A);
 
-	double valor = 2.7378;
+	double valor = 3;
 	multiplicacionPorEscalar(A, valor);
 
 	cout << endl;
@@ -272,7 +279,7 @@ void TestEcuaciones(){
 void Test15SegCatedra(){
 	// levanto los archivos
 	fstream ent ("Enunciado/tests_tp1/test_15_segundos.txt", ios::in);
-	fstream sal ("salida_test_15_seg_ReduceRow2.txt", ios::out);
+	fstream sal ("salida_test_15_seg.txt", ios::out);
 
 	//creo la matriz rala
 	int n;
@@ -623,7 +630,6 @@ void compararResultados15Segs(){
 		errores << errorI << endl;
 	}
 
-	cout << errorFinal << endl;
 	errorFinal = errorFinal / 2000;
 	cout << "nuestro promedio de error en el de 15 segundos es es: ";
 	cout << errorFinal << endl;
@@ -652,7 +658,6 @@ void compararResultados30Segs(){
 		errores << errorI << endl;
 	}
 
-	cout << errorFinal << endl;
 	errorFinal = errorFinal / 3000;
 	cout << "nuestro promedio de error en el de 30 segundos es: ";
 	cout << errorFinal << endl;
@@ -665,18 +670,21 @@ void compararResultados30Segs(){
 
 int main(){
 	srand(time(NULL));
+	// Test1ParaSuma();
+	// Test1ParaMult();
+	// Test1ParaMultPorEsc();
 	// TestEcuaciones();
 	// TestSolveLinearEquatinos();
 	//TestGeneradores(7);
 	//TestEliminacionGaussiana();
-	//Test1ParaSuma();
-	//Test1ParaMultPorEsc();
+	
+	
 	// TestAleatorioDesordenadoCatedra();
 	Test15SegCatedra();
-	 compararResultados15Segs();
+	compararResultados15Segs();
 	
-	 Test30SegCatedra();
-	 compararResultados30Segs();
+	Test30SegCatedra();
+ 	compararResultados30Segs();
 	// TestAleatorioCatedra();
 	// TestAleatorioDesordenadoCatedra();
 	// TestCompleto();

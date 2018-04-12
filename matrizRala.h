@@ -129,7 +129,7 @@ void createTranspose(Rala& A, Rala& At){
 	int n = A.n;
 	for(int i = 0; i < n ; i ++){
 		for(map<int,double>::iterator it = A.conex[i].begin() ; it != (A.conex[i]).end(); it ++){
-			insertarElemento(At, i, it->first, it -> second);
+			insertarElemento(At, it->first, i, it -> second);
 		}
 	}
 }
@@ -290,6 +290,7 @@ void eliminacionGaussiana(Rala & A, vector<double> & conjunta){
 				if(iteradores[j]->first == col ){
 					iteradores[j] ++;	
 					reduceRowFromPivot(row,pivot, j, col ,n, conjunta);
+					A.conex[j] = row;
 				}
 			}
 		}
@@ -342,13 +343,13 @@ void eliminacionGaussiana(Rala & A, vector<double> & conjunta){
 // Resuelve la ecuación lineal A*res = conjunta
 // Devuelve el resultado en res (que vendría a ser el vector x)
 void solveLinearEquations(Rala& A, vector<double> & conjunta, vector<double> & res , int n ){
-	std::chrono::time_point<std::chrono::system_clock> start = std::chrono::system_clock::now();
+	// std::chrono::time_point<std::chrono::system_clock> start = std::chrono::system_clock::now();
 	eliminacionGaussiana(A, conjunta);
-	std::chrono::time_point<std::chrono::system_clock> end = std::chrono::system_clock::now();
- 	std::chrono::duration<double, std::milli> elapsed_seconds = end - start;
-	cout << "eliminacionGaussiana toma : " << (elapsed_seconds).count() << endl;
+	// std::chrono::time_point<std::chrono::system_clock> end = std::chrono::system_clock::now();
+ // 	std::chrono::duration<double, std::milli> elapsed_seconds = end - start;
+	// cout << "eliminacionGaussiana toma : " << (elapsed_seconds).count() << endl;
 
-	start = std::chrono::system_clock::now();
+	// start = std::chrono::system_clock::now();
 	for(int i = n-1; i >= 0 ; i --){
 		//double ac = conjunta [i];
 		double ac = 0 ;
@@ -360,9 +361,9 @@ void solveLinearEquations(Rala& A, vector<double> & conjunta, vector<double> & r
 		}
 		res[i] = (conjunta[i] - ac )/ (A.conex[i]).find(i)->second;
 	} 
-	end = std::chrono::system_clock::now();
- 	elapsed_seconds = end - start;
-	cout << "Resolver el sistema toma : " << (elapsed_seconds).count() << endl;
+	// end = std::chrono::system_clock::now();
+ // 	elapsed_seconds = end - start;
+	// cout << "Resolver el sistema toma : " << (elapsed_seconds).count() << endl;
 
 }
 
@@ -370,45 +371,45 @@ void solveLinearEquations(Rala& A, vector<double> & conjunta, vector<double> & r
 // entradas: matriz de conectividad W, vector res para la salida (debe tener size n)
 // salida: el vector de entrada res
 void resolverPageRank(Rala& W, vector<double>& res, double p){
-	std::chrono::time_point<std::chrono::system_clock> start, end;
+	// std::chrono::time_point<std::chrono::system_clock> start, end;
 
 	int n = W.n;
-	start = std::chrono::system_clock::now();
+	// start = std::chrono::system_clock::now();
 	Rala WxDxp = Rala(n);
 	Rala MatrizAIgualar = Rala(n);
 	Rala I = CrearIdentidad(n);
 	Rala D  = Rala(n);
 	vector<double> e = generarVectorE(n);	//Creo e 
 	
-	end = std::chrono::system_clock::now();
-	std::chrono::duration<double, std::milli> elapsed_seconds = end - start;
-	cout << "Crear matrices toma : " << (elapsed_seconds).count() << endl;
+	// end = std::chrono::system_clock::now();
+	// std::chrono::duration<double, std::milli> elapsed_seconds = end - start;
+	// cout << "Crear matrices toma : " << (elapsed_seconds).count() << endl;
 	
 	double prob = p * (-1); //uso -p para poder multiplicar directamente y luego usar sumaMatricial.
 
 	generarMatrizDiagonalD(D, W); //Creo D según la matriz de conectividad W
 
 
-	start = std::chrono::system_clock::now();
+	// start = std::chrono::system_clock::now();
 	multiplicacionMatricial(W, D, WxDxp); // WD => WxDxp
 
-	end = std::chrono::system_clock::now();
-	elapsed_seconds = end - start;
-	cout << "Multiplicar matrices toma : " << (elapsed_seconds).count() << endl;
+	// end = std::chrono::system_clock::now();
+	// elapsed_seconds = end - start;
+	// cout << "Multiplicar matrices toma : " << (elapsed_seconds).count() << endl;
 
-	start = std::chrono::system_clock::now();
+	// start = std::chrono::system_clock::now();
 	multiplicacionPorEscalar(WxDxp, prob); // WxDxp = -pWD
 
-	end = std::chrono::system_clock::now();
-	elapsed_seconds = end - start;
-	cout << "Multiplicar matriz por escalar toma : " << (elapsed_seconds).count() << endl;
+	// end = std::chrono::system_clock::now();
+	// elapsed_seconds = end - start;
+	// cout << "Multiplicar matriz por escalar toma : " << (elapsed_seconds).count() << endl;
 
-	start = std::chrono::system_clock::now();
+	// start = std::chrono::system_clock::now();
 	sumaMatricial(I, WxDxp, MatrizAIgualar);		// WxDxp = (I + (-pWD))
 	
-	end = std::chrono::system_clock::now();
-	elapsed_seconds = end - start;
-	cout << "Sumar matrices toma : " << (elapsed_seconds).count() << endl;
+	// end = std::chrono::system_clock::now();
+	// elapsed_seconds = end - start;
+	// cout << "Sumar matrices toma : " << (elapsed_seconds).count() << endl;
 
 	// en este punto ya tengo calculado el (I - pWD) en la matriz rala WxDxp
 	
