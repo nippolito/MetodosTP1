@@ -674,7 +674,7 @@ int main(){
 	// TestAleatorioDesordenadoCatedra();
 	Test15SegCatedra();
 	// Test30SegCatedra();
-	// compararResultados15Segs();
+	 compararResultados15Segs();
 	// compararResultados30Segs();
 	// TestAleatorioCatedra();
 	// TestAleatorioDesordenadoCatedra();
