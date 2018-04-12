@@ -222,7 +222,7 @@ void multiplicacionPorEscalar(Rala& A, double valor){
 // pasás la fila y columna donde está el pivote (fila sirve para modificar Linv)
 // así como la fila entera del pivote (pivot) y la fila entera a modificar (row)
 // la columna te sirve para saber dónde comenzar la resta de filas 
-void reduceRowFromPivot(map<int,double>& row, map<int,double>& pivot, int fila, int col, int n, vector<double> & conjunta){
+void reduceRowFromPivot(map<int,double>& row, map<int,double>& pivot, int fila, int col, int n, vector<double> & conjunta, map<int,double>::iterator& currentItRow){
 	map<int,double>::iterator itPivot = pivot.find(col); // siempre lo encuentra pues la matriz es inversible
 	map<int,double>::iterator itRow = row.find(col);	// siempre lo encuentra pues el código de EG evita llamar a esta función si no lo hace
 	double pivotBase = itPivot->second;
@@ -249,6 +249,7 @@ void reduceRowFromPivot(map<int,double>& row, map<int,double>& pivot, int fila, 
 				if( abs((itRow -> second) - coeficiente * (itPivot -> second )) > 0  ){
 					itRow -> second = (itRow -> second) - coeficiente * (itPivot -> second );
 				}else{
+					currentItRow ++;
 					row.erase(itRow);
 				}
 				itPivot ++;
@@ -285,12 +286,10 @@ void eliminacionGaussiana(Rala & A, vector<double> & conjunta){
 		map<int,double> pivot = A.conex[col];
 
 		for(int j = col+1; j < A.n ; j++){
-			map<int,double>  row = A.conex[j];
-			if(iteradores[j] != row.end()){
+			if(iteradores[j] != A.conex[j].end()){
 				if(iteradores[j]->first == col ){
 					iteradores[j] ++;	
-					reduceRowFromPivot(row,pivot, j, col ,n, conjunta);
-					A.conex[j] = row;
+					reduceRowFromPivot(A.conex[j],pivot, j, col ,n, conjunta, iteradores[j]);
 				}
 			}
 		}
