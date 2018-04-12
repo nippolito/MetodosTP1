@@ -631,9 +631,8 @@ void compararResultados15Segs(){
 		errores << errorI << endl;
 	}
 
-	cout << errorFinal << endl;
 	errorFinal = errorFinal / 2000;
-	cout << "nuestro promedio de error en el de 15 segundos es es: ";
+	cout << "nuestro promedio de error en el de 15 segundos es: ";
 	cout << errorFinal << endl;
 
 	catedra.close();
@@ -660,7 +659,6 @@ void compararResultados30Segs(){
 		errores << errorI << endl;
 	}
 
-	cout << errorFinal << endl;
 	errorFinal = errorFinal / 3000;
 	cout << "nuestro promedio de error en el de 30 segundos es: ";
 	cout << errorFinal << endl;
@@ -687,11 +685,11 @@ int main(){
 	//Test1ParaSuma();
 	//Test1ParaMultPorEsc();
 	// TestAleatorioDesordenadoCatedra();
-	// Test15SegCatedra();
-	// compararResultados15Segs();
+	Test15SegCatedra();
+	compararResultados15Segs();
 
-	// Test30SegCatedra();
-	// compararResultados30Segs();
+	Test30SegCatedra();
+	compararResultados30Segs();
 
 
 	return 0;
