@@ -673,9 +673,10 @@ int main(){
 	//Test1ParaMultPorEsc();
 	// TestAleatorioDesordenadoCatedra();
 	Test15SegCatedra();
-	// Test30SegCatedra();
-	// compararResultados15Segs();
-	// compararResultados30Segs();
+	 compararResultados15Segs();
+	
+	 Test30SegCatedra();
+	 compararResultados30Segs();
 	// TestAleatorioCatedra();
 	// TestAleatorioDesordenadoCatedra();
 	// TestCompleto();
