@@ -119,8 +119,10 @@ void Test1ParaSuma(){ 	// pasa, todo OK
 	insertarElemento(B, 2, 2, 3);
 
 	Rala C = Rala(A.n);
-	cout << "MATRIZ RESULTADO VACIA: " << endl;
-	mostrarRala(C);
+	cout << "MATRIZ A: " << endl;
+	mostrarRala(A);
+	cout << "MATRIZ B: " << endl;
+	mostrarRala(B);
 	sumaMatricial(A, B, C);
 	cout << "MATRIZ FINAL:" << endl;
 	mostrarRala(C);
@@ -135,18 +137,22 @@ void Test1ParaMult(){ 	// pasa, todo OK
 	insertarElemento(A, 1, 0, 2);
 	insertarElemento(A, 1, 1, 1);
 	insertarElemento(A, 2, 1, 2);
-	insertarElemento(B, 0, 0, 4);
+	insertarElemento(B, 0, 0, 1);
 	insertarElemento(B, 0, 1, 2);
 	insertarElemento(B, 1, 2, 1);
 	insertarElemento(B, 2, 0, 1);
 	insertarElemento(B, 2, 2, 3);
 
+	cout << "MATRIZ A: " << endl;
 	mostrarRala(A);
+	cout << "MATRIZ B: " << endl;
 	mostrarRala(B);
+
+	cout << endl;
 
 	Rala C = Rala(A.n);
 	multiplicacionMatricial(A, B, C);
-	cout << endl;
+	cout << "MATRIZ FINAL" << endl;
 	mostrarRala(C);	
 }
 
@@ -158,14 +164,16 @@ void Test1ParaMultPorEsc(){ 	// pasa, todo OK
 	insertarElemento(A, 1, 1, 1);
 	insertarElemento(A, 2, 1, 2);
 
-	cout << endl;
+	cout << "MATRIZ A: " << endl;
 	mostrarRala(A);
 
-	double valor = 2.7378;
+	double valor = 3;
 	multiplicacionPorEscalar(A, valor);
 
 	cout << endl;
+	cout << "MATRIZ FINAL: " << endl;
 	mostrarRala(A);	
+	cout << endl;
 }
 
 void TestEliminacionGaussiana(){
@@ -272,7 +280,7 @@ void TestEcuaciones(){
 void Test15SegCatedra(){
 	// levanto los archivos
 	fstream ent ("Enunciado/tests_tp1/test_15_segundos.txt", ios::in);
-	fstream sal ("salida_test_15_seg_ReduceRow2.txt", ios::out);
+	fstream sal ("salida_test_15_seg.txt", ios::out);
 
 	//creo la matriz rala
 	int n;
@@ -665,9 +673,12 @@ void compararResultados30Segs(){
 
 int main(){
 	srand(time(NULL));
-	// TestEcuaciones();
+	// Test1ParaSuma();
+	// Test1ParaMultPorEsc();
+	// Test1ParaMult();
 
-	//TestSolveLinearEquatinos();
+	// TestEcuaciones();
+	// TestSolveLinearEquatinos();
 
 	// TestSolveLinearEquatinos();
 
@@ -676,11 +687,12 @@ int main(){
 	//Test1ParaSuma();
 	//Test1ParaMultPorEsc();
 	// TestAleatorioDesordenadoCatedra();
-	 Test15SegCatedra();
-	 compararResultados15Segs();
+	// Test15SegCatedra();
+	// compararResultados15Segs();
 
-	 Test30SegCatedra();
-	 compararResultados30Segs();
+	// Test30SegCatedra();
+	// compararResultados30Segs();
+
 
 	return 0;
 }
