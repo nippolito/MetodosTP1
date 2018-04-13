@@ -330,10 +330,6 @@ void eliminacionGaussiana(Rala & A, vector<double> & conjunta){
 		map<int,double> pivot = A.conex[col];
 
 		for(int j = col+1; j < A.n ; j++){
-			cout << "Viendo de pivotear fila " << j << " con fila " <<col << endl;
-			cout << iteradores[col]->second << endl;
-			cout << iteradores[j]->second << endl;
-			cout << A.conex[j].end()->second << endl;
 				
 			if(iteradores[j] != A.conex[j].end()){
 				
