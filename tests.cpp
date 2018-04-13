@@ -50,8 +50,8 @@ int generarMatrizAleatoria(Rala& A, int proba, double fMin, double fMax){
 }
 
 
-int generarMatrizConectividad(Rala A, int proba){
-	int n = A.n;
+int generarMatrizConectividad(Rala* A, int proba){
+	int n = A ->n;
 	int rangoProba = proba;
 	if(rangoProba > 10 || rangoProba < 0){return -1;}
 	
@@ -64,7 +64,7 @@ int generarMatrizConectividad(Rala A, int proba){
 				if(fila != columna){
 					int prob = (rand() % 10)+1;
 					if(prob <= rangoProba){
-					insertarElemento(A, fila, columna, 1);
+					insertarElemento(*A, fila, columna, 1);
 					}	
 				}	
 			}
@@ -99,7 +99,7 @@ int generarMatrizIdentidad(Rala A){
 void TestGeneradores(int prob){
 	
 	Rala A = Rala(5);
-	generarMatrizConectividad(A, prob);
+	generarMatrizConectividad(&A, prob);
 	mostrarRala(A);
 }
 
@@ -252,7 +252,7 @@ void TestSolveLinearEquatinos(){
 
 void TestEcuaciones(){
 	Rala W = Rala(5);
-	generarMatrizConectividad(W, 5);
+	generarMatrizConectividad(&W, 5);
 	vector<double> res(5,0.0);
 	resolverPageRank(W, res, 1.0);
 	cout << endl;
@@ -668,6 +668,53 @@ void compararResultados30Segs(){
 }
 
 
+
+void TestDensidadTiempos(){
+	// levanto los archivos
+	//fstream ent ("Enunciado/tests_tp1/test_completo.txt", ios::in);
+	fstream salidaDensTiempo ("salida_test_densidad_tiempo.csv", ios::out);
+	
+
+	for (int i = 0; i < 10; i++){
+		
+		for(int cantRepeticiones = 0 ; cantRepeticiones < 1 ; cantRepeticiones++){ 
+
+		/*Cant repeticiones??*/
+			if(cantRepeticiones == 0){
+				cout<< "RALA CON DENSIDAD : " <<  i <<endl;
+			}
+	
+		Rala W = Rala(500); //2500 paginas para todos los casos (el test de 15 tenia 2000 y el de 30 3000).
+		generarMatrizConectividad(&W, i);
+
+		
+		double p = 0.5; // !?!?!? P FIJO, PERO CUAL?
+
+		vector<double> res(500, 0);
+		std::chrono::time_point<std::chrono::system_clock> start, end;
+
+		start = std::chrono::system_clock::now();
+		resolverPageRank(W, res, p);
+		end = std::chrono::system_clock::now();
+
+		std::chrono::duration<double, std::milli> elapsed_seconds = end-start;
+
+		salidaDensTiempo << i << "," << elapsed_seconds.count() << endl;
+		
+
+		}
+	
+	}
+	
+	salidaDensTiempo.close();
+
+}
+
+
+
+
+
+
 int main(){
 	srand(time(NULL));
 	// Test1ParaSuma();
@@ -683,9 +730,11 @@ int main(){
 	//Test15SegCatedra();
 	//compararResultados15Segs();
 	
+
+	TestDensidadTiempos();
 	//Test30SegCatedra();
  	//compararResultados30Segs();
-	 TestAleatorioCatedra();
+	//TestAleatorioCatedra();
 	// TestAleatorioDesordenadoCatedra();
 	// TestCompleto();
 	// TestSinLinksCatedra();
