@@ -2,6 +2,7 @@
 #include <fstream>
 #include <chrono>
 #include "matrizRala.h"
+#include "funcAdicionales.cpp"
 
 
 
@@ -739,7 +740,32 @@ void testPeter(){
 
 }
 
+void testComparadorDeResultados(){
+	fstream ent ("Enunciado/tests_tp1/test_aleatorio_desordenado.txt", ios::in);
+	
+	//creo la matriz Rala
+	int n;
+	int m;
+	ent >> n;
+	ent >> m;
+	Rala W = Rala(n);
 
+	// lleno la matriz Rala W con todas las conexiones, o sea la matriz de conectividad
+	for(int i = 0; i < m; i++){
+		int source;
+		int dest;
+		ent >> source;
+		ent >> dest;
+		insertarElemento(W, dest - 1, source - 1, 1);
+	}
+
+	// corro el código que resuelve el pageRank
+
+	
+	double p = 0.76;
+	vector<double> res(n, 0);
+	comparadorDeResultados(W, p);
+}
 
 int main(){
 	srand(time(NULL));
@@ -753,12 +779,12 @@ int main(){
 	
 	
 	// TestAleatorioDesordenadoCatedra();
-	Test15SegCatedra();
+	//Test15SegCatedra();
 	//compararResultados15Segs();
 	
 
 	//TestDensidadTiempos();
-	//testPeter();
+	testComparadorDeResultados();
 	//Test30SegCatedra();
  	//compararResultados30Segs();
 	//TestAleatorioCatedra();

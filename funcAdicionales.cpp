@@ -1,7 +1,6 @@
 #include <iostream>
 #include <fstream>
 #include <chrono>
-#include "matrizRala.h"
 
 
 using namespace std;
@@ -80,34 +79,117 @@ void eliminacionGaussianaLinv(Rala & A, Rala & linv){
 	}
 }
 
+void crearMatrizEZ(Rala& diagonal, Rala& ez, double p){
+	for (int i = 0; i < diagonal.n; i++)
+	{
+		if (diagonal.conex[i].find(i)->second > 0)
+		{
+			for (int j = 0; j < diagonal.n; j++)
+			{
+				insertarElemento(ez, i, j, (1-p)/diagonal.n);
 
-int main(){
-	int n = 3;
-	Rala A = Rala(n);
-	Rala Linv = CrearIdentidad(n);
+			}
+		}
+		else
+		{
+			for (int j = 0; j < diagonal.n; j++)
+			{
 
-	/*
-	2 7 9 = 1   0   0     2   7    9
-	1 3 6 = 1/2 1   0  *  0  -1/2  3/2
-	4 5 8 = 2   18  0     0   0    -31
-	*/
-	insertarElemento(A, 0, 0, 2);
-	insertarElemento(A, 0, 1, 7);
-	insertarElemento(A, 0, 2, 9);
+				insertarElemento(ez, i, j, 1/diagonal.n);
+			}
+		}
+	}	
+}
 
-	insertarElemento(A, 1, 0, 1);
-	insertarElemento(A, 1, 1, 3);
-	insertarElemento(A, 1, 2, 6);
+void generarMatrizDeViajeroAleatorio(Rala& Wm, Rala& A, double p){
+	//creo matriz diagonal
+	Rala Diagonal = Rala(Wm.n);
+	generarMatrizDiagonalD(Diagonal, Wm);
 
-	insertarElemento(A, 2, 0, 4);
-	insertarElemento(A, 2, 1, 5);
-	insertarElemento(A, 2, 2, 8);
+	//creo WD = pWD
+	Rala WD = Rala(Wm.n);
+	multiplicacionMatricial(Wm, Diagonal, WD);
+	multiplicacionPorEscalar(WD, p);
+	
+	//creo matriz e * z traspuesto
+	Rala ez = Rala(Wm.n);
+	crearMatrizEZ(Diagonal, ez, p);
 
-	eliminacionGaussianaLinv(A, Linv);
-	mostrarRala(A);
+	sumaMatricial(WD, ez, A);
 
-	mostrarRala(Linv);
+}
+
+//resta dos vectores y los normaliza en funcion a norma 1
+void normalizarDiferenciaVectores(vector<double>& a, vector<double>& b){
+	double sumaNormalizar = 0.0;
+
+	for (int i = 0; i < a.size(); i++)
+	{
+		a[i] = abs(a[i] - b[i]);
+		sumaNormalizar += a[i];
+	}
+	for (int i = 0; i < a.size(); i++)
+	{
+		a[i] = a[i]/sumaNormalizar;
+	}
+}
+
+void mostrarVector(vector<double>& vec){
+	cout << "[ ";
+	for (int i = 0; i < vec.size()-1; ++i)
+	{
+		cout << vec[i] << ", ";
+	}
+	cout << vec[vec.size()-1] <<" ]" << endl;
+}
+
+void comparadorDeResultados(Rala& W, double p){
+	//genero vector resultado de page rank
+	vector<double> res(W.n, 0);
+	resolverPageRank(W, res, p);
+
+	//genero una matriz A para viajero aleatorio
+	Rala A = Rala(W.n);
+	generarMatrizDeViajeroAleatorio(W, A, p);
+
+	//multiplico la matriz por el vector resultado y guardo el nuevo resultado
+	vector<double> multiplicacionAporRes(A.n, 0);
+	multiplicacionPorVector(A, res, multiplicacionAporRes);
+
+	normalizarDiferenciaVectores(res, multiplicacionAporRes);
+
+	mostrarVector(res);
+
+}
+
+
+// int main(){
+// 	int n = 3;
+// 	Rala A = Rala(n);
+// 	Rala Linv = CrearIdentidad(n);
+
+// 	/*
+// 	2 7 9 = 1   0   0     2   7    9
+// 	1 3 6 = 1/2 1   0  *  0  -1/2  3/2
+// 	4 5 8 = 2   18  0     0   0    -31
+// 	*/
+// 	insertarElemento(A, 0, 0, 2);
+// 	insertarElemento(A, 0, 1, 7);
+// 	insertarElemento(A, 0, 2, 9);
+
+// 	insertarElemento(A, 1, 0, 1);
+// 	insertarElemento(A, 1, 1, 3);
+// 	insertarElemento(A, 1, 2, 6);
+
+// 	insertarElemento(A, 2, 0, 4);
+// 	insertarElemento(A, 2, 1, 5);
+// 	insertarElemento(A, 2, 2, 8);
+
+// 	eliminacionGaussianaLinv(A, Linv);
+// 	mostrarRala(A);
+
+// 	mostrarRala(Linv);
 
 	
 
-}
+// }

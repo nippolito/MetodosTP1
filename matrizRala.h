@@ -207,6 +207,21 @@ void multiplicacionMatricial(Rala& A, Rala& B, Rala& C){
 	}
 }
 
+// Ax = Y
+// Modifica vector res con el resultado de Ax
+void multiplicacionPorVector(Rala& A, vector<double>& vecArg, vector<double>& vecRes){
+	for (int i = 0; i < A.n; i++){
+		map<int,double>::iterator itRow = A.conex[i].begin();
+		double sumaFilaColumna = 0.0;
+		for (; itRow != A.conex[i].end() ; itRow++)
+		{
+			sumaFilaColumna += itRow->second * vecArg[itRow->first];
+		}
+		vecRes[i] = sumaFilaColumna;
+	}
+}
+
+
 // A = A*valor
 // modifica A
 void multiplicacionPorEscalar(Rala& A, double valor){
@@ -333,9 +348,6 @@ void eliminacionGaussiana(Rala & A, vector<double> & conjunta){
 		map<int,double> pivot = A.conex[col];
 
 		for(int j = col+1; j < A.n ; j++){
-			cout << "Viendo de pivotear fila " << j << " con fila " <<col << endl;
-			cout << iteradores[col]->first << endl;
-			cout << iteradores[j]->first << endl;
 				
 			if(iteradores[j] != A.conex[j].end()){
 				
@@ -397,6 +409,7 @@ void eliminacionGaussiana(Rala & A, vector<double> & conjunta){
 void solveLinearEquations(Rala& A, vector<double> & conjunta, vector<double> & res , int n ){
 	// std::chrono::time_point<std::chrono::system_clock> start = std::chrono::system_clock::now();
 	eliminacionGaussiana(A, conjunta);
+	
 	// std::chrono::time_point<std::chrono::system_clock> end = std::chrono::system_clock::now();
  // 	std::chrono::duration<double, std::milli> elapsed_seconds = end - start;
 	// cout << "eliminacionGaussiana toma : " << (elapsed_seconds).count() << endl;
