@@ -298,11 +298,13 @@ void reduceRowFromPivotFix(map<int,double>& row, map<int,double>& pivot, int fil
 				// (en que va a ser modificado puede volverse cero, en ese caso lo borro)
 				std::map<int, double>::iterator itAux = itRow;
 				itAux ++;
-				if(fabs((itRow -> second) - coeficiente * (itPivot -> second)) < DBL_EPSILON){
+				if(fabs((itRow -> second) - coeficiente * (itPivot -> second)) > DBL_EPSILON){
+					// si los elems son distintos
 					noentra++;
 					itRow -> second = (itRow -> second) - coeficiente * (itPivot -> second );
 
 				}else{
+					// si los elems son iguales
 					entra++;
 					row.erase(itRow);
 				}
@@ -322,11 +324,11 @@ void reduceRowFromPivotFix(map<int,double>& row, map<int,double>& pivot, int fil
 
 //--------------------------------------------------------TIPOS DE COMPARACIÓN DOUBLES
 
-// fabs((itRow -> second) - coeficiente * (itPivot -> second)) < DBL_EPSILON
+// fabs((itRow -> second) - coeficiente * (itPivot -> second)) < DBL_EPSILON (si es true entonces son iguales)
 	// > error de 0.0005 con -O3
 	// > tiempo de 20 segs con -O3
 	// > entra: 30675036 vs noentra: 174272.
-// fabs((itRow -> second) - coeficiente * (itPivot -> second)) > 0 ----> evalua siempre a true
+// fabs((itRow -> second) - coeficiente * (itPivot -> second)) > 0 ----> evalua siempre a true, o sea siempre a distintos
 // itRow->second == coeficiente * itPivot->second ----> se traba en la columna 1994
 // fabs((itRow -> second) - coeficiente * (itPivot -> second)) < FLT_EPSILON ---> se traba en la columna 1998
 // AlmostEqualRelative(itRow->second, coeficiente * itPivot->second, FLT_EPSILON)

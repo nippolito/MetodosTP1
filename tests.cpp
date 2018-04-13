@@ -136,6 +136,51 @@ void generarMatrizDeViajeroAleatorio(Rala& Wm, Rala& A, double p){
 //-------------------------------------------------------------TESTS GENERALES
 
 
+void testPeter(){
+	int n = 3;
+	Rala A = Rala(n);
+	
+	/*
+	2 7 9 = 1   0   0     2   7    9
+	1 3 6 = 1/2 1   0  *  0  -1/2  3/2
+	4 5 8 = 2   18  0     0   0    -37
+	*/
+	insertarElemento(A, 0, 0, 2);
+	insertarElemento(A, 0, 1, 7);
+	insertarElemento(A, 0, 2, 9);
+
+	insertarElemento(A, 1, 0, 1);
+	insertarElemento(A, 1, 1, 3);
+	insertarElemento(A, 1, 2, 6);
+
+	insertarElemento(A, 2, 0, 4);
+	insertarElemento(A, 2, 1, 5);
+	insertarElemento(A, 2, 2, 8);
+	vector<double> vect(n, 0);
+	eliminacionGaussiana(A, vect);
+	mostrarRala(A);
+}
+
+void testNipo(){ // OK
+	int n = 3;
+	Rala A = Rala(n);
+
+	insertarElemento(A, 0, 0, 4);
+	insertarElemento(A, 0, 1, 2);
+	insertarElemento(A, 0, 2, 4);
+
+	insertarElemento(A, 1, 0, 2);
+	insertarElemento(A, 1, 1, 4);
+	insertarElemento(A, 1, 2, 2);
+
+	insertarElemento(A, 2, 1, 1);
+	insertarElemento(A, 2, 2, 7);	
+
+	vector<double> vect(n, 0);
+	eliminacionGaussiana(A, vect);
+	mostrarRala(A);
+}
+
 void TestGeneradores(int prob){
 	
 	Rala A = Rala(5);
@@ -707,8 +752,6 @@ void compararResultados30Segs(){
 	errores.close();
 }
 
-
-
 void TestDensidadTiempos(){
 	// levanto los archivos
 	//fstream ent ("Enunciado/tests_tp1/test_completo.txt", ios::in);
@@ -747,53 +790,6 @@ void TestDensidadTiempos(){
 	}
 	
 	salidaDensTiempo.close();
-
-}
-
-
-void testPeter(){
-	int n = 3;
-	Rala A = Rala(n);
-	
-	/*
-	2 7 9 = 1   0   0     2   7    9
-	1 3 6 = 1/2 1   0  *  0  -1/2  3/2
-	4 5 8 = 2   18  0     0   0    -37
-	*/
-	insertarElemento(A, 0, 0, 2);
-	insertarElemento(A, 0, 1, 7);
-	insertarElemento(A, 0, 2, 9);
-
-	insertarElemento(A, 1, 0, 1);
-	insertarElemento(A, 1, 1, 3);
-	insertarElemento(A, 1, 2, 6);
-
-	insertarElemento(A, 2, 0, 4);
-	insertarElemento(A, 2, 1, 5);
-	insertarElemento(A, 2, 2, 8);
-	vector<double> vect(n, 0);
-	eliminacionGaussiana(A, vect);
-	mostrarRala(A);
-}
-
-void testNipo(){ // OK
-	int n = 3;
-	Rala A = Rala(n);
-
-	insertarElemento(A, 0, 0, 4);
-	insertarElemento(A, 0, 1, 2);
-	insertarElemento(A, 0, 2, 4);
-
-	insertarElemento(A, 1, 0, 2);
-	insertarElemento(A, 1, 1, 4);
-	insertarElemento(A, 1, 2, 2);
-
-	insertarElemento(A, 2, 1, 1);
-	insertarElemento(A, 2, 2, 7);	
-
-	vector<double> vect(n, 0);
-	eliminacionGaussiana(A, vect);
-	mostrarRala(A);
 }
 
 //resta dos vectores y los normaliza en funcion a norma 1
@@ -824,6 +820,9 @@ void comparadorDeResultados(Rala& W, double p){
 	vector<double> multiplicacionAporRes(A.n, 0);
 	multiplicacionPorVector(A, res, multiplicacionAporRes);
 
+	mostrarVector(res);
+	mostrarVector(multiplicacionAporRes);
+
 	normalizarDiferenciaVectores(res, multiplicacionAporRes);
 
 	mostrarVector(res);
@@ -849,9 +848,6 @@ void testComparadorDeResultados(){
 		insertarElemento(W, dest - 1, source - 1, 1);
 	}
 
-	// corro el código que resuelve el pageRank
-
-	
 	double p = 0.76;
 	vector<double> res(n, 0);
 	comparadorDeResultados(W, p);
@@ -883,6 +879,8 @@ int main(){
 	// TestCompleto();
 	// TestSinLinksCatedra();
 	// TestTrivialCatedra();
+
+	// testComparadorDeResultados();
 
 	return 0;
 }
