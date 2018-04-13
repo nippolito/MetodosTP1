@@ -218,60 +218,22 @@ void multiplicacionPorEscalar(Rala& A, double valor){
 }
 
 
-// realiza la resta de filas en eliminación gausseana (Ejemplo: F3 = F3 - 2F1)
-// pasás la fila y columna donde está el pivote (fila sirve para modificar Linv)
-// así como la fila entera del pivote (pivot) y la fila entera a modificar (row)
-// la columna te sirve para saber dónde comenzar la resta de filas 
-void reduceRowFromPivot(map<int,double>& row, map<int,double>& pivot, int fila, int col, int n, vector<double> & conjunta, map<int,double>::iterator& currentItRow){
+
+void reduceRowFromPivotFix(map<int,double>& row, map<int,double>& pivot, int fila, int col, int n, vector<double> & conjunta){
 	map<int,double>::iterator itPivot = pivot.find(col); // siempre lo encuentra pues la matriz es inversible
 	map<int,double>::iterator itRow = row.find(col);	// siempre lo encuentra pues el código de EG evita llamar a esta función si no lo hace
 	double pivotBase = itPivot->second;
 	double rowBase = itRow->second;
 	double coeficiente = rowBase / pivotBase;
+
+	//forzar la priemr conversion a 0
+
+	map<int,double>::iterator itAux = itRow;
+	itAux ++;
+	row.erase(itRow->first);
+	itRow = itAux;
+	itPivot ++;
 	
-	conjunta[fila] -=  conjunta[col] * coeficiente; 
-
-	while(itPivot != pivot.end() ){
-		//si termine de recorrerlo hago todas las incersiones que se deba
-		if( itRow == row.end()){
-			for(;itPivot != pivot.end(); itPivot ++){
-				row.insert(pair<int,double>(itPivot->first, -1 * (itPivot->second) * coeficiente));
-			}
-		}
-		else{
-			//si se encuentra el lugar
-			if(itRow -> first == itPivot -> first){
-				std::map<int, double>::iterator itAux = itRow;
-				itAux ++;
-				if( abs((itRow -> second) - coeficiente * (itPivot -> second )) > 0  ){
-					itRow -> second = (itRow -> second) - coeficiente * (itPivot -> second );
-
-				}else{
-					//currentItRow ++;
-					row.erase(itRow);
-				}
-				itPivot ++;
-				itRow = itAux; 
-			}
-			else if (itRow -> first > itPivot -> first) {
-				row.insert(pair<int,double>(itPivot->first, -1 * (itPivot->second) * coeficiente));
-				itPivot ++;
-			}
-			else if (itRow -> first < itPivot -> first) {
-				itRow ++;
-			}
-		}
-	}
-}
-
-void reduceRowFromPivotFix(map<int,double>& row, map<int,double>& pivot, int fila, int col, int n, vector<double> & conjunta, map<int,double>::iterator& currentItRow){
-	map<int,double>::iterator itPivot = pivot.find(col); // siempre lo encuentra pues la matriz es inversible
-	map<int,double>::iterator itRow = currentItRow;	// siempre lo encuentra pues el código de EG evita llamar a esta función si no lo hace
-	double pivotBase = itPivot->second;
-	double rowBase = itRow->second;
-	double coeficiente = rowBase / pivotBase;
-	
-	currentItRow ++;
 								
 	conjunta[fila] -=  conjunta[col] * coeficiente; 
 
@@ -320,83 +282,24 @@ void reduceRowFromPivotFix(map<int,double>& row, map<int,double>& pivot, int fil
 void eliminacionGaussiana(Rala & A, vector<double> & conjunta){
 	int n = A.n ;
 
-	vector<map<int,double>::iterator> iteradores (n);
-	for(int j = 0 ; j < n ; j ++){
-		iteradores[j] = A.conex[j].begin();
-	}
-
 	for(int col = 0  ; col < n ; col ++){
 		// transformar los ceros y hago las restas correspondientes (Ejemplo: F2 = F2 - 3F1)	
 		map<int,double> pivot = A.conex[col];
 
 		for(int j = col+1; j < A.n ; j++){
-			cout << "Viendo de pivotear fila " << j << " con fila " <<col << endl;
-			cout << iteradores[col]->first << endl;
-			cout << iteradores[j]->first << endl;
-				
-			if(iteradores[j] != A.conex[j].end()){
-				
-				if(iteradores[j]->first == col ){
-					reduceRowFromPivot(A.conex[j],pivot, j, col ,n, conjunta, iteradores[j]);
+				if(A.conex[j].begin() -> first == col ){
+					reduceRowFromPivotFix(A.conex[j],pivot, j, col ,n, conjunta);
 				}
-			}
 		}
 	}
 }
-
-// esta es EG con pivot-eo parcial
-// modifica la matriz de entrada A
-// En Linv guarda lo que sería L de la fact LU (pero multiplicado por -1)
-// En Permu guarda el vector de permutaciones
-/*void eliminacionGaussianaPivoteoParcial(Rala & A, Rala & Linv , Rala & Permu){
-	int n = A.n ;
-	for(int i = 0  ; i < n ; i ++){
-		int filaMax = maxIndexInMapFromKey(&A, i, A.n);
-		if(filaMax != -1){
-			//--------------------  Reacomodar posiciones.
-			map<int,double> * mapTempA = (A.conex)[i];
-			map<int,double> * mapTempL = (Linv.conex)[i];
-			map<int,double> * mapTempP = (Linv.conex)[i];
-			
-			
-			(A.conex)[i] = (A.conex)[filaMax];
-			(A.conex)[filaMax] = mapTempA;
-
-			(Linv.conex)[i] = (Linv.conex)[filaMax];
-			(Linv.conex)[filaMax] = mapTempL;
-
-			(Permu.conex)[i] = (Permu.conex)[filaMax];
-			(Permu.conex)[filaMax] = mapTempL;
-			//-------------------- 	transformar los ceros y hago las restas correspondientes
-			map<int,double>* pivot = A.conex[i];
-
-			for(int j = i+1; j < A.n ; j++){
-				map<int,double> * row = A.conex[j];
-				if(row -> find(i) != row->end()){
-					reduceRowFromPivot(row,pivot, j, i ,n, &Linv);
-				}
-			}
-		}
-	}
-	Rala C = Rala(n);
-
-	Rala id = CrearIdentidad(n);
-	sumaMatricial(Linv, id, C);
-	Linv = C;
-}
-*/
 
 // NO TIENE QUE TENER CEROS EN LA DIAGONAL
 // Resuelve la ecuación lineal A*res = conjunta
 // Devuelve el resultado en res (que vendría a ser el vector x)
 void solveLinearEquations(Rala& A, vector<double> & conjunta, vector<double> & res , int n ){
-	// std::chrono::time_point<std::chrono::system_clock> start = std::chrono::system_clock::now();
 	eliminacionGaussiana(A, conjunta);
-	// std::chrono::time_point<std::chrono::system_clock> end = std::chrono::system_clock::now();
- // 	std::chrono::duration<double, std::milli> elapsed_seconds = end - start;
-	// cout << "eliminacionGaussiana toma : " << (elapsed_seconds).count() << endl;
-
-	// start = std::chrono::system_clock::now();
+	
 	for(int i = n-1; i >= 0 ; i --){
 		//double ac = conjunta [i];
 		double ac = 0 ;
@@ -408,58 +311,28 @@ void solveLinearEquations(Rala& A, vector<double> & conjunta, vector<double> & r
 		}
 		res[i] = (conjunta[i] - ac )/ (A.conex[i]).find(i)->second;
 	} 
-	// end = std::chrono::system_clock::now();
- // 	elapsed_seconds = end - start;
-	// cout << "Resolver el sistema toma : " << (elapsed_seconds).count() << endl;
-
 }
 
 // resuelve el PageRank
 // entradas: matriz de conectividad W, vector res para la salida (debe tener size n)
 // salida: el vector de entrada res
 void resolverPageRank(Rala& W, vector<double>& res, double p){
-	// std::chrono::time_point<std::chrono::system_clock> start, end;
-
 	int n = W.n;
-	// start = std::chrono::system_clock::now();
 	Rala WxDxp = Rala(n);
 	Rala MatrizAIgualar = Rala(n);
 	Rala I = CrearIdentidad(n);
 	Rala D  = Rala(n);
 	vector<double> e = generarVectorE(n);	//Creo e 
 	
-	// end = std::chrono::system_clock::now();
-	// std::chrono::duration<double, std::milli> elapsed_seconds = end - start;
-	// cout << "Crear matrices toma : " << (elapsed_seconds).count() << endl;
-	
 	double prob = p * (-1); //uso -p para poder multiplicar directamente y luego usar sumaMatricial.
 
 	generarMatrizDiagonalD(D, W); //Creo D según la matriz de conectividad W
 
 
-	// start = std::chrono::system_clock::now();
 	multiplicacionMatricial(W, D, WxDxp); // WD => WxDxp
-
-	// end = std::chrono::system_clock::now();
-	// elapsed_seconds = end - start;
-	// cout << "Multiplicar matrices toma : " << (elapsed_seconds).count() << endl;
-
-	// start = std::chrono::system_clock::now();
 	multiplicacionPorEscalar(WxDxp, prob); // WxDxp = -pWD
 
-	// end = std::chrono::system_clock::now();
-	// elapsed_seconds = end - start;
-	// cout << "Multiplicar matriz por escalar toma : " << (elapsed_seconds).count() << endl;
-
-	// start = std::chrono::system_clock::now();
 	sumaMatricial(I, WxDxp, MatrizAIgualar);		// WxDxp = (I + (-pWD))
-	
-	// end = std::chrono::system_clock::now();
-	// elapsed_seconds = end - start;
-	// cout << "Sumar matrices toma : " << (elapsed_seconds).count() << endl;
-
-	// en este punto ya tengo calculado el (I - pWD) en la matriz rala WxDxp
-	
 
 	solveLinearEquations(MatrizAIgualar, e, res, n);	//Resuelvo ecuacion y devuelvo resultado en res pasado por parametro.
 
