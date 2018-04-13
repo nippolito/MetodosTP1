@@ -274,7 +274,8 @@ void reduceRowFromPivotFix(map<int,double>& row, map<int,double>& pivot, int fil
 	double rowBase = itRow->second;
 	double coeficiente = rowBase / pivotBase;
 	
-					
+	currentItRow ++;
+								
 	conjunta[fila] -=  conjunta[col] * coeficiente; 
 
 	while(itPivot != pivot.end() ){
@@ -296,7 +297,6 @@ void reduceRowFromPivotFix(map<int,double>& row, map<int,double>& pivot, int fil
 					itRow -> second = (itRow -> second) - coeficiente * (itPivot -> second );
 
 				}else{
-					currentItRow ++;
 					row.erase(itRow);
 				}
 				itPivot ++;
@@ -333,6 +333,9 @@ void eliminacionGaussiana(Rala & A, vector<double> & conjunta){
 		map<int,double> pivot = A.conex[col];
 
 		for(int j = col+1; j < A.n ; j++){
+			cout << "Viendo de pivotear fila " << j << " con fila " <<col << endl;
+			cout << iteradores[col]->first << endl;
+			cout << iteradores[j]->first << endl;
 				
 			if(iteradores[j] != A.conex[j].end()){
 				
