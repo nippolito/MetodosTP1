@@ -711,7 +711,33 @@ void TestDensidadTiempos(){
 }
 
 
+void testPeter(){
+	int n = 3;
+	Rala A = Rala(n);
+	
+	/*
+	2 7 9 = 1   0   0     2   7    9
+	1 3 6 = 1/2 1   0  *  0  -1/2  3/2
+	4 5 8 = 2   18  0     0   0    -31
+	*/
+	insertarElemento(A, 0, 0, 2);
+	insertarElemento(A, 0, 1, 7);
+	insertarElemento(A, 0, 2, 9);
 
+	insertarElemento(A, 1, 0, 1);
+	insertarElemento(A, 1, 1, 3);
+	insertarElemento(A, 1, 2, 6);
+
+	insertarElemento(A, 2, 0, 4);
+	insertarElemento(A, 2, 1, 5);
+	insertarElemento(A, 2, 2, 8);
+	vector<double> vect(n, 0);
+	eliminacionGaussiana(A, vect);
+	mostrarRala(A);
+
+	
+
+}
 
 
 
@@ -733,6 +759,7 @@ int main(){
 	Test30SegCatedra();
  	compararResultados30Segs();
 	// TestAleatorioCatedra();
+
 	// TestAleatorioDesordenadoCatedra();
 	// TestCompleto();
 	// TestSinLinksCatedra();

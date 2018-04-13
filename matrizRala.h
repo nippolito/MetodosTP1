@@ -245,6 +245,53 @@ void reduceRowFromPivot(map<int,double>& row, map<int,double>& pivot, int fila, 
 				itAux ++;
 				if( abs((itRow -> second) - coeficiente * (itPivot -> second )) > 0  ){
 					itRow -> second = (itRow -> second) - coeficiente * (itPivot -> second );
+
+				}else{
+					//currentItRow ++;
+					row.erase(itRow);
+				}
+				itPivot ++;
+				itRow = itAux; 
+			}
+			else if (itRow -> first > itPivot -> first) {
+				row.insert(pair<int,double>(itPivot->first, -1 * (itPivot->second) * coeficiente));
+				itPivot ++;
+			}
+			else if (itRow -> first < itPivot -> first) {
+				itRow ++;
+			}
+		}
+	}
+}
+
+void reduceRowFromPivotFix(map<int,double>& row, map<int,double>& pivot, int fila, int col, int n, vector<double> & conjunta, map<int,double>::iterator& currentItRow){
+	map<int,double>::iterator itPivot = pivot.find(col); // siempre lo encuentra pues la matriz es inversible
+	map<int,double>::iterator itRow = currentItRow;	// siempre lo encuentra pues el código de EG evita llamar a esta función si no lo hace
+	double pivotBase = itPivot->second;
+	double rowBase = itRow->second;
+	double coeficiente = rowBase / pivotBase;
+	
+					
+	conjunta[fila] -=  conjunta[col] * coeficiente; 
+
+	while(itPivot != pivot.end() ){
+		// recorro la fila del pivote pues si hay un cero en una columna, no hay que hacer nada
+		if( itRow == row.end()){
+			// si llegaste al final de la fila que estabas modificando, entonces hubo varios ceros antes
+			// que ahora vas a tener que modificar
+			for(;itPivot != pivot.end(); itPivot ++){
+				row.insert(pair<int,double>(itPivot->first, -1 * (itPivot->second) * coeficiente));
+			}
+		}
+		else{
+			if(itRow -> first == itPivot -> first){
+				// si están ambos en la misma col, realizo los cálculos
+				// (en que va a ser modificado puede volverse cero, en ese caso lo borro)
+				std::map<int, double>::iterator itAux = itRow;
+				itAux ++;
+				if( abs((itRow -> second) - coeficiente * (itPivot -> second )) > 0  ){
+					itRow -> second = (itRow -> second) - coeficiente * (itPivot -> second );
+
 				}else{
 					currentItRow ++;
 					row.erase(itRow);
@@ -283,7 +330,13 @@ void eliminacionGaussiana(Rala & A, vector<double> & conjunta){
 		map<int,double> pivot = A.conex[col];
 
 		for(int j = col+1; j < A.n ; j++){
+			cout << "Viendo de pivotear fila " << j << " con fila " <<col << endl;
+			cout << iteradores[col]->second << endl;
+			cout << iteradores[j]->second << endl;
+			cout << A.conex[j].end()->second << endl;
+				
 			if(iteradores[j] != A.conex[j].end()){
+				
 				if(iteradores[j]->first == col ){
 					reduceRowFromPivot(A.conex[j],pivot, j, col ,n, conjunta, iteradores[j]);
 				}
