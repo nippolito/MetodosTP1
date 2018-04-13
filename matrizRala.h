@@ -256,7 +256,7 @@ void multiplicacionPorVector(Rala& A, vector<double>& vecArg, vector<double>& ve
 
 
 
-void reduceRowFromPivotFix(map<int,double>& row, map<int,double>& pivot, int fila, int col, int n, vector<double> & conjunta, int & entra, int & noentra){
+void reduceRowFromPivotFix(map<int,double>& row, map<int,double>& pivot, int fila, int col, int n, vector<double> & conjunta, long long int & entra, long long int & noentra){
 	map<int,double>::iterator itPivot = pivot.find(col); // siempre lo encuentra pues la matriz es inversible
 	map<int,double>::iterator itRow = row.find(col);	// siempre lo encuentra pues el código de EG evita llamar a esta función si no lo hace
 	double pivotBase = itPivot->second;
@@ -324,13 +324,10 @@ void reduceRowFromPivotFix(map<int,double>& row, map<int,double>& pivot, int fil
 
 //--------------------------------------------------------TIPOS DE COMPARACIÓN DOUBLES
 
-// fabs((itRow -> second) - coeficiente * (itPivot -> second)) < DBL_EPSILON (si es true entonces son iguales)
-	// > error de 0.0005 con -O3
-	// > tiempo de 20 segs con -O3
-	// > entra: 30675036 vs noentra: 174272.
+// fabs((itRow -> second) - coeficiente * (itPivot -> second)) <= DBL_EPSILON (si es true entonces son iguales)
 // fabs((itRow -> second) - coeficiente * (itPivot -> second)) > 0 ----> evalua siempre a true, o sea siempre a distintos
 // itRow->second == coeficiente * itPivot->second ----> se traba en la columna 1994
-// fabs((itRow -> second) - coeficiente * (itPivot -> second)) < FLT_EPSILON ---> se traba en la columna 1998
+// fabs((itRow -> second) - coeficiente * (itPivot -> second)) <= FLT_EPSILON (si es true, entonces son iguales)
 // AlmostEqualRelative(itRow->second, coeficiente * itPivot->second, FLT_EPSILON)
 	// > error de 0.0005 con -O3
 	// > tiempo de 21 segs con -O3
@@ -345,13 +342,13 @@ void reduceRowFromPivotFix(map<int,double>& row, map<int,double>& pivot, int fil
 // Precondición >>>> asumimos que le pasamos matrices en las que se puede aplicar EG (pues por TP eso vale siempre)
 void eliminacionGaussiana(Rala & A, vector<double> & conjunta){
 	int n = A.n ;
-	int entra = 0;
-	int noentra = 0;
+	long long int entra = 0;
+	long long int noentra = 0;
 	for(int col = 0  ; col < n ; col ++){
 		// transformar los ceros y hago las restas correspondientes (Ejemplo: F2 = F2 - 3F1)	
 		map<int,double> pivot = A.conex[col];
-		cout << "va por la col: ";
-		cout << col << endl;
+		// cout << "va por la col: ";
+		// cout << col << endl;
 
 		for(int j = col+1; j < A.n ; j++){
 			if(A.conex[j].begin() -> first == col ){

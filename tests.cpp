@@ -868,8 +868,8 @@ int main(){
 	
 	
 	// TestAleatorioDesordenadoCatedra();
-	Test15SegCatedra();
-	compararResultados15Segs();
+	// Test15SegCatedra();
+	// compararResultados15Segs();
 	
 	// Test30SegCatedra();
 	// compararResultados30Segs();
