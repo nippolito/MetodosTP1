@@ -1,7 +1,6 @@
 #include <iostream>
 #include <fstream>
 #include <chrono>
-#include "matrizRala.h"
 
 
 using namespace std;
@@ -81,33 +80,37 @@ void eliminacionGaussianaLinv(Rala & A, Rala & linv){
 }
 
 
-int main(){
-	int n = 3;
-	Rala A = Rala(n);
-	Rala Linv = CrearIdentidad(n);
 
-	/*
-	2 7 9 = 1   0   0     2   7    9
-	1 3 6 = 1/2 1   0  *  0  -1/2  3/2
-	4 5 8 = 2   18  0     0   0    -31
-	*/
-	insertarElemento(A, 0, 0, 2);
-	insertarElemento(A, 0, 1, 7);
-	insertarElemento(A, 0, 2, 9);
 
-	insertarElemento(A, 1, 0, 1);
-	insertarElemento(A, 1, 1, 3);
-	insertarElemento(A, 1, 2, 6);
 
-	insertarElemento(A, 2, 0, 4);
-	insertarElemento(A, 2, 1, 5);
-	insertarElemento(A, 2, 2, 8);
 
-	eliminacionGaussianaLinv(A, Linv);
-	mostrarRala(A);
+// int main(){
+// 	int n = 3;
+// 	Rala A = Rala(n);
+// 	Rala Linv = CrearIdentidad(n);
 
-	mostrarRala(Linv);
+// 	/*
+// 	2 7 9 = 1   0   0     2   7    9
+// 	1 3 6 = 1/2 1   0  *  0  -1/2  3/2
+// 	4 5 8 = 2   18  0     0   0    -31
+// 	*/
+// 	insertarElemento(A, 0, 0, 2);
+// 	insertarElemento(A, 0, 1, 7);
+// 	insertarElemento(A, 0, 2, 9);
+
+// 	insertarElemento(A, 1, 0, 1);
+// 	insertarElemento(A, 1, 1, 3);
+// 	insertarElemento(A, 1, 2, 6);
+
+// 	insertarElemento(A, 2, 0, 4);
+// 	insertarElemento(A, 2, 1, 5);
+// 	insertarElemento(A, 2, 2, 8);
+
+// 	eliminacionGaussianaLinv(A, Linv);
+// 	mostrarRala(A);
+
+// 	mostrarRala(Linv);
 
 	
 
-}
+// }

@@ -4,11 +4,11 @@
 #include <vector>
 #include <utility> // para pair
 #include <map>
-#include <cmath> 
+#include <cmath>
+#include <stdio.h> 
+#include <float.h>
 
 using namespace std;
-
-double epsilon = 0.000000000001;
 
 class Rala{
 public:
@@ -50,9 +50,31 @@ int gradoSalida(struct Rala& A, int j){
 	return res;
 }
 
+bool AlmostEqualRelative(double A, double B, double maxRelDiff)
+{
+    // Calculate the difference.
+    double diff = fabs(A - B);
+    A = fabs(A);
+    B = fabs(B);
+    // Find the largest
+    float largest = (B > A) ? B : A;
+ 
+    if (diff <= largest * maxRelDiff)
+        return true;
+    return false;
+}
+
 
 //--------------------------------------------------------FUNCIONES PARA MOSTRAR MATRICES
 
+void mostrarVector(vector<double>& vec){
+	cout << "[ ";
+	for (int i = 0; i < vec.size()-1; ++i)
+	{
+		cout << vec[i] << ", ";
+	}
+	cout << vec[vec.size()-1] <<" ]" << endl;
+}
 
 void mostrarVectorEnteros(vector<double>& v ){
 	int n  = v.size();
@@ -200,7 +222,7 @@ void multiplicacionMatricial(Rala& A, Rala& B, Rala& C){
 			map<int,double> filA = A.conex[i];
 			map<int,double> colB = transp.conex[j];
 			double multRes = multiplicarFilas(filA, colB, n);
-			if(abs(multRes) > 0 ){
+			if(fabs(multRes) > 0){
 				insertarElemento(C,i,j,multRes);
 			}
 		}
@@ -217,23 +239,47 @@ void multiplicacionPorEscalar(Rala& A, double valor){
 	}
 }
 
+// Ax = Y
+// Modifica vector res con el resultado de Ax
+void multiplicacionPorVector(Rala& A, vector<double>& vecArg, vector<double>& vecRes){
+	for (int i = 0; i < A.n; i++){
+		map<int,double>::iterator itRow = A.conex[i].begin();
+		double sumaFilaColumna = 0.0;
+		for (; itRow != A.conex[i].end() ; itRow++)
+		{
+			sumaFilaColumna += itRow->second * vecArg[itRow->first];
+		}
+		vecRes[i] = sumaFilaColumna;
+	}
+}
 
 
-void reduceRowFromPivotFix(map<int,double>& row, map<int,double>& pivot, int fila, int col, int n, vector<double> & conjunta){
+
+
+void reduceRowFromPivotFix(map<int,double>& row, map<int,double>& pivot, int fila, int col, int n, vector<double> & conjunta, int & entra, int & noentra){
 	map<int,double>::iterator itPivot = pivot.find(col); // siempre lo encuentra pues la matriz es inversible
 	map<int,double>::iterator itRow = row.find(col);	// siempre lo encuentra pues el código de EG evita llamar a esta función si no lo hace
 	double pivotBase = itPivot->second;
 	double rowBase = itRow->second;
 	double coeficiente = rowBase / pivotBase;
 
-	//forzar la priemr conversion a 0
+	// forzar la primer conversion a 0, pues por errores de precisión
+	// puede dar true el (abs((itRow -> second) - coeficiente * (itPivot -> second )) > 0)
+	// haciendo que no se borre el elemento que sí o sí hay que triangular
 
 	map<int,double>::iterator itAux = itRow;
 	itAux ++;
 	row.erase(itRow->first);
 	itRow = itAux;
+	// if(col == 1994){
+	// 	cout << "quepasaaa5" << endl;
+	// 	cout << itPivot->second << endl;
+	// }
 	itPivot ++;
 	
+	// if(col == 1994){
+	// 	cout << "quepasaaa3" << endl;
+	// }
 								
 	conjunta[fila] -=  conjunta[col] * coeficiente; 
 
@@ -252,10 +298,12 @@ void reduceRowFromPivotFix(map<int,double>& row, map<int,double>& pivot, int fil
 				// (en que va a ser modificado puede volverse cero, en ese caso lo borro)
 				std::map<int, double>::iterator itAux = itRow;
 				itAux ++;
-				if( abs((itRow -> second) - coeficiente * (itPivot -> second )) > 0  ){
+				if(fabs((itRow -> second) - coeficiente * (itPivot -> second)) < DBL_EPSILON){
+					noentra++;
 					itRow -> second = (itRow -> second) - coeficiente * (itPivot -> second );
 
 				}else{
+					entra++;
 					row.erase(itRow);
 				}
 				itPivot ++;
@@ -272,6 +320,20 @@ void reduceRowFromPivotFix(map<int,double>& row, map<int,double>& pivot, int fil
 	}
 }
 
+//--------------------------------------------------------TIPOS DE COMPARACIÓN DOUBLES
+
+// fabs((itRow -> second) - coeficiente * (itPivot -> second)) < DBL_EPSILON
+	// > error de 0.0005 con -O3
+	// > tiempo de 20 segs con -O3
+	// > entra: 30675036 vs noentra: 174272.
+// fabs((itRow -> second) - coeficiente * (itPivot -> second)) > 0 ----> evalua siempre a true
+// itRow->second == coeficiente * itPivot->second ----> se traba en la columna 1994
+// fabs((itRow -> second) - coeficiente * (itPivot -> second)) < FLT_EPSILON ---> se traba en la columna 1998
+// AlmostEqualRelative(itRow->second, coeficiente * itPivot->second, FLT_EPSILON)
+	// > error de 0.0005 con -O3
+	// > tiempo de 21 segs con -O3
+	// > entra: 31797450 vs noentra: 465663
+// AlmostEqualRelative(itRow->second, coeficiente * itPivot->second, DLT_EPSILON) --> se traba en col 1998
 
 //--------------------------------------------------------ELIMINACIÓN GAUSSIANA + CÁLCULO PAGERANK
 
@@ -281,17 +343,24 @@ void reduceRowFromPivotFix(map<int,double>& row, map<int,double>& pivot, int fil
 // Precondición >>>> asumimos que le pasamos matrices en las que se puede aplicar EG (pues por TP eso vale siempre)
 void eliminacionGaussiana(Rala & A, vector<double> & conjunta){
 	int n = A.n ;
-
+	int entra = 0;
+	int noentra = 0;
 	for(int col = 0  ; col < n ; col ++){
 		// transformar los ceros y hago las restas correspondientes (Ejemplo: F2 = F2 - 3F1)	
 		map<int,double> pivot = A.conex[col];
+		cout << "va por la col: ";
+		cout << col << endl;
 
 		for(int j = col+1; j < A.n ; j++){
-				if(A.conex[j].begin() -> first == col ){
-					reduceRowFromPivotFix(A.conex[j],pivot, j, col ,n, conjunta);
-				}
+			if(A.conex[j].begin() -> first == col ){
+				reduceRowFromPivotFix(A.conex[j],pivot, j, col ,n, conjunta, entra, noentra);
+			}
 		}
 	}
+	cout << "entra: ";
+	cout << entra << endl;
+	cout << "noentra: ";
+	cout << noentra << endl;
 }
 
 // NO TIENE QUE TENER CEROS EN LA DIAGONAL
@@ -350,3 +419,4 @@ void resolverPageRank(Rala& W, vector<double>& res, double p){
 
 	// MUY IMPORTANTE!!!!! ACÁ NOS FALTA NORMALIZAR EL VECTOR RES	
 }
+

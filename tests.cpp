@@ -80,6 +80,28 @@ int generarMatrizConectividad(Rala* A, int proba){
 
 }
 
+void crearMatrizEZ(Rala& diagonal, Rala& ez, double p){
+	for (int i = 0; i < diagonal.n; i++)
+	{
+		if (diagonal.conex[i].find(i)->second > 0)
+		{
+			for (int j = 0; j < diagonal.n; j++)
+			{
+				insertarElemento(ez, i, j, (1-p)/diagonal.n);
+
+			}
+		}
+		else
+		{
+			for (int j = 0; j < diagonal.n; j++)
+			{
+
+				insertarElemento(ez, i, j, 1/diagonal.n);
+			}
+		}
+	}	
+}
+
 int generarMatrizIdentidad(Rala A){
 	int n = A.n;
 
@@ -90,6 +112,24 @@ int generarMatrizIdentidad(Rala A){
 
 		return 1;
 	
+}
+
+void generarMatrizDeViajeroAleatorio(Rala& Wm, Rala& A, double p){
+	//creo matriz diagonal
+	Rala Diagonal = Rala(Wm.n);
+	generarMatrizDiagonalD(Diagonal, Wm);
+
+	//creo WD = pWD
+	Rala WD = Rala(Wm.n);
+	multiplicacionMatricial(Wm, Diagonal, WD);
+	multiplicacionPorEscalar(WD, p);
+	
+	//creo matriz e * z traspuesto
+	Rala ez = Rala(Wm.n);
+	crearMatrizEZ(Diagonal, ez, p);
+
+	sumaMatricial(WD, ez, A);
+
 }
 
 
@@ -718,7 +758,7 @@ void testPeter(){
 	/*
 	2 7 9 = 1   0   0     2   7    9
 	1 3 6 = 1/2 1   0  *  0  -1/2  3/2
-	4 5 8 = 2   18  0     0   0    -31
+	4 5 8 = 2   18  0     0   0    -37
 	*/
 	insertarElemento(A, 0, 0, 2);
 	insertarElemento(A, 0, 1, 7);
@@ -734,11 +774,88 @@ void testPeter(){
 	vector<double> vect(n, 0);
 	eliminacionGaussiana(A, vect);
 	mostrarRala(A);
+}
 
-	
+void testNipo(){ // OK
+	int n = 3;
+	Rala A = Rala(n);
+
+	insertarElemento(A, 0, 0, 4);
+	insertarElemento(A, 0, 1, 2);
+	insertarElemento(A, 0, 2, 4);
+
+	insertarElemento(A, 1, 0, 2);
+	insertarElemento(A, 1, 1, 4);
+	insertarElemento(A, 1, 2, 2);
+
+	insertarElemento(A, 2, 1, 1);
+	insertarElemento(A, 2, 2, 7);	
+
+	vector<double> vect(n, 0);
+	eliminacionGaussiana(A, vect);
+	mostrarRala(A);
+}
+
+//resta dos vectores y los normaliza en funcion a norma 1
+void normalizarDiferenciaVectores(vector<double>& a, vector<double>& b){
+	double sumaNormalizar = 0.0;
+
+	for (int i = 0; i < a.size(); i++)
+	{
+		a[i] = abs(a[i] - b[i]);
+		sumaNormalizar += a[i];
+	}
+	for (int i = 0; i < a.size(); i++)
+	{
+		a[i] = a[i]/sumaNormalizar;
+	}
+}
+
+void comparadorDeResultados(Rala& W, double p){
+	//genero vector resultado de page rank
+	vector<double> res(W.n, 0);
+	resolverPageRank(W, res, p);
+
+	//genero una matriz A para viajero aleatorio
+	Rala A = Rala(W.n);
+	generarMatrizDeViajeroAleatorio(W, A, p);
+
+	//multiplico la matriz por el vector resultado y guardo el nuevo resultado
+	vector<double> multiplicacionAporRes(A.n, 0);
+	multiplicacionPorVector(A, res, multiplicacionAporRes);
+
+	normalizarDiferenciaVectores(res, multiplicacionAporRes);
+
+	mostrarVector(res);
 
 }
 
+void testComparadorDeResultados(){
+	fstream ent ("Enunciado/tests_tp1/test_aleatorio_desordenado.txt", ios::in);
+	
+	//creo la matriz Rala
+	int n;
+	int m;
+	ent >> n;
+	ent >> m;
+	Rala W = Rala(n);
+
+	// lleno la matriz Rala W con todas las conexiones, o sea la matriz de conectividad
+	for(int i = 0; i < m; i++){
+		int source;
+		int dest;
+		ent >> source;
+		ent >> dest;
+		insertarElemento(W, dest - 1, source - 1, 1);
+	}
+
+	// corro el código que resuelve el pageRank
+
+	
+	double p = 0.76;
+	vector<double> res(n, 0);
+	comparadorDeResultados(W, p);
+}
 
 
 int main(){
@@ -747,17 +864,19 @@ int main(){
 	// Test1ParaMult();
 	// Test1ParaMultPorEsc();
 	// TestEcuaciones();
+	// testPeter();
+	// testNipo();
 	// TestSolveLinearEquatinos();
 	//TestGeneradores(7);
 	//TestEliminacionGaussiana();
 	
 	
 	// TestAleatorioDesordenadoCatedra();
-	//Test15SegCatedra();
-	//compararResultados15Segs();
+	Test15SegCatedra();
+	compararResultados15Segs();
 	
-	Test30SegCatedra();
- 	compararResultados30Segs();
+	// Test30SegCatedra();
+	// compararResultados30Segs();
 	// TestAleatorioCatedra();
 
 	// TestAleatorioDesordenadoCatedra();
