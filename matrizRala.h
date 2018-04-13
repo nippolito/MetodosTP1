@@ -232,18 +232,15 @@ void reduceRowFromPivot(map<int,double>& row, map<int,double>& pivot, int fila, 
 	conjunta[fila] -=  conjunta[col] * coeficiente; 
 
 	while(itPivot != pivot.end() ){
-		// recorro la fila del pivote pues si hay un cero en una columna, no hay que hacer nada
+		//si termine de recorrerlo hago todas las incersiones que se deba
 		if( itRow == row.end()){
-			// si llegaste al final de la fila que estabas modificando, entonces hubo varios ceros antes
-			// que ahora vas a tener que modificar
 			for(;itPivot != pivot.end(); itPivot ++){
 				row.insert(pair<int,double>(itPivot->first, -1 * (itPivot->second) * coeficiente));
 			}
 		}
 		else{
+			//si se encuentra el lugar
 			if(itRow -> first == itPivot -> first){
-				// si están ambos en la misma col, realizo los cálculos
-				// (en que va a ser modificado puede volverse cero, en ese caso lo borro)
 				std::map<int, double>::iterator itAux = itRow;
 				itAux ++;
 				if( abs((itRow -> second) - coeficiente * (itPivot -> second )) > 0  ){
@@ -288,7 +285,6 @@ void eliminacionGaussiana(Rala & A, vector<double> & conjunta){
 		for(int j = col+1; j < A.n ; j++){
 			if(iteradores[j] != A.conex[j].end()){
 				if(iteradores[j]->first == col ){
-					iteradores[j] ++;	
 					reduceRowFromPivot(A.conex[j],pivot, j, col ,n, conjunta, iteradores[j]);
 				}
 			}
