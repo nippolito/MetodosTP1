@@ -273,7 +273,7 @@ void reduceRowFromPivotFix(map<int,double>& row, map<int,double>& pivot, int fil
 	double pivotBase = itPivot->second;
 	double rowBase = itRow->second;
 	double coeficiente = rowBase / pivotBase;
-	currentItRow ++;
+	
 					
 	conjunta[fila] -=  conjunta[col] * coeficiente; 
 
@@ -296,6 +296,7 @@ void reduceRowFromPivotFix(map<int,double>& row, map<int,double>& pivot, int fil
 					itRow -> second = (itRow -> second) - coeficiente * (itPivot -> second );
 
 				}else{
+					currentItRow ++;
 					row.erase(itRow);
 				}
 				itPivot ++;
