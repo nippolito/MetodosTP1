@@ -3,8 +3,8 @@
 #include <chrono>
 #include "matrizRala.h"
 
-
-
+int no = 0;
+int si = 0;
 
 //-------------------------------------------------------------GENERADORES DE MATRICES ALEATORIAS
 //TODOS LOS GENERADORES TOMAN UNA MATRIZ NULA COMO ENTRADA!
@@ -85,21 +85,26 @@ void crearMatrizEZ(Rala& diagonal, Rala& ez, double p){
 	{
 		if (diagonal.conex[i].find(i)->second > 0)
 		{
+			si++;
 			for (int j = 0; j < diagonal.n; j++)
 			{
-				insertarElemento(ez, i, j, (1-p)/diagonal.n);
+				insertarElemento(ez, j, i, (1-p)/diagonal.n);
 
 			}
 		}
 		else
 		{
+			no++;
 			for (int j = 0; j < diagonal.n; j++)
 			{
-
-				insertarElemento(ez, i, j, 1/diagonal.n);
+				insertarElemento(ez, j, i, 1.0/diagonal.n);
 			}
 		}
-	}	
+	}
+	cout << "no: ";
+	cout << no << endl;
+	cout << "si: ";
+	cout << si << endl;	
 }
 
 int generarMatrizIdentidad(Rala A){
@@ -130,6 +135,24 @@ void generarMatrizDeViajeroAleatorio(Rala& Wm, Rala& A, double p){
 
 	sumaMatricial(WD, ez, A);
 
+}
+
+void testNipoParaPeter(){
+	Rala W = Rala(5);
+	generarMatrizConectividad(&W, 2);
+	Rala Diagonal = Rala(5);
+	generarMatrizDiagonalD(Diagonal, W);
+
+	cout << "W es" << endl;
+	mostrarRala(W);
+	cout << "Diagonal es" << endl;
+	mostrarRala(Diagonal);
+
+	Rala ez = Rala(5);
+	crearMatrizEZ(Diagonal, ez, 0.4);
+
+	cout << "EZ es" << endl;
+	mostrarRala(ez);
 }
 
 
@@ -807,8 +830,6 @@ void normalizarDiferenciaVectores(vector<double>& a, vector<double>& b){
 	// {
 	// 	a[i] = a[i]/sumaNormalizar;
 	// }
-
-
 }
 
 void comparadorDeResultados(Rala& W, double p){
@@ -838,7 +859,6 @@ void comparadorDeResultados(Rala& W, double p){
 	cout << errorTot << endl;
 
 	// mostrarVector(res);
-
 }
 
 void testComparadorDeResultados(){
@@ -926,22 +946,22 @@ void testNormaAxMenosX(){
 // si varía el error relativo según p
 void testCambiaPrecisionSegunP(){
 	srand(600); 	// semilla 600 porque pinta
-	fstream sal("test_cambiaPrecisionSegunP.csv", ios::out);
+	fstream sal("test_cambiaPrecisionSegunP2.csv", ios::out);
 	double densidad = 5; // densidad matrices
-	double p = 0.1;
+	double p = 0.5;
+	int sizeMatriz = 1000;
 
 	sal << "n,normaAxMenosX,TiempoPR,p" << endl;
 
-	for(int i = 1000; i < 1001; i = i++){
+	for(int i = 1000; i < 1009; i++){
 		cout << "voy por p: ";
 		cout << p << endl;
-		for(int j = 0; j < 10; j++){
-			int n = i;
-			sal << n;
+		for(int j = 0; j < 30; j++){
+			sal << sizeMatriz;
 			sal << ",";
-			Rala W = Rala(n);
+			Rala W = Rala(sizeMatriz);
 			generarMatrizConectividad(&W, densidad);
-			vector<double> res(n, 0);
+			vector<double> res(sizeMatriz, 0);
 
 			// resuelvo pageRank y tomo el tiempo
 			std::chrono::time_point<std::chrono::system_clock> start, end;
@@ -962,8 +982,8 @@ void testCambiaPrecisionSegunP(){
 			// ahora en cada elemento de res tengo el error relativo de ese res_i, 
 
 			double errorTot = 0;
-			for(int i = 0; i < res.size(); i++){
-				errorTot += pow(res[i],2);
+			for(int k = 0; k < res.size(); k++){
+				errorTot += pow(res[k],2);
 			}
 
 			errorTot = sqrt(errorTot);
@@ -1010,6 +1030,7 @@ int main(){
 	// testComparadorDeResultados();
 	// testNormaAxMenosX();
 	// testCambiaPrecisionSegunP();
+	testNipoParaPeter();
 
 	return 0;
 }
