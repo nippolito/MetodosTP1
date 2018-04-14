@@ -49,7 +49,7 @@ int generarMatrizAleatoria(Rala& A, int proba, double fMin, double fMax){
 	}	
 }
 
-
+// proba es la densidad (en el rango 0 a 10)
 int generarMatrizConectividad(Rala* A, int proba){
 	int n = A ->n;
 	int rangoProba = proba;
@@ -799,18 +799,21 @@ void normalizarDiferenciaVectores(vector<double>& a, vector<double>& b){
 	for (int i = 0; i < a.size(); i++)
 	{
 		a[i] = abs(a[i] - b[i]);
-		sumaNormalizar += a[i];
+		// ahora en cada a[i] tengo el error de cada x_i específico
+		// sumaNormalizar += a[i];
+
 	}
-	for (int i = 0; i < a.size(); i++)
-	{
-		a[i] = a[i]/sumaNormalizar;
-	}
+	// for (int i = 0; i < a.size(); i++)
+	// {
+	// 	a[i] = a[i]/sumaNormalizar;
+	// }
+
+
 }
 
 void comparadorDeResultados(Rala& W, double p){
 	//genero vector resultado de page rank
 	vector<double> res(W.n, 0);
-	resolverPageRank(W, res, p);
 
 	//genero una matriz A para viajero aleatorio
 	Rala A = Rala(W.n);
@@ -820,12 +823,21 @@ void comparadorDeResultados(Rala& W, double p){
 	vector<double> multiplicacionAporRes(A.n, 0);
 	multiplicacionPorVector(A, res, multiplicacionAporRes);
 
-	mostrarVector(res);
-	mostrarVector(multiplicacionAporRes);
-
 	normalizarDiferenciaVectores(res, multiplicacionAporRes);
+	// ahora en cada elemento de res tengo el error relativo de ese res_i, si sumo todos tengo la norma 1
 
-	mostrarVector(res);
+	double errorTot = 0;
+	for(int i = 0; i < res.size(); i++){
+		errorTot += res[i];
+	}
+
+	// errorTot es la norma 1 de (multiplicacionAporRes - res) == |Ax - x|_1
+
+	// errorTot = errorTot / res.size();
+
+	cout << errorTot << endl;
+
+	// mostrarVector(res);
 
 }
 
@@ -853,9 +865,124 @@ void testComparadorDeResultados(){
 	comparadorDeResultados(W, p);
 }
 
+// dejo fijo densidad y p. Varío n desde 10 hasta 1000 (aumentando de a 10) con 10 iteraciones en cada uno.
+// Testeo |Ax-x| en cada uno y de paso printeo el tiempo ya que estamos (el que tarda en resolver el pageRank)
+void testNormaAxMenosX(){
+	srand(500); 	// semilla 500 porque pinta
+	fstream sal("test_NormaAxMenosX.csv", ios::out);
+	int hasta = 1000;
+	int densidad = 5;
+	double p = 0.5; // densidad matrices
+
+	sal << "n,normaAxMenosX,TiempoPR" << endl;
+
+	for(int i = 10; i < hasta + 1; i = i + 10){
+		cout << "voy por n: ";
+		cout << i << endl;
+		for(int j = 0; j < 10; j++){
+			int n = i;
+			sal << n;
+			sal << ",";
+			Rala W = Rala(n);
+			generarMatrizConectividad(&W, densidad);
+			vector<double> res(n, 0);
+
+			// resuelvo pageRank y tomo el tiempo
+			std::chrono::time_point<std::chrono::system_clock> start, end;
+			start = std::chrono::system_clock::now();
+			resolverPageRank(W, res, p);
+			end = std::chrono::system_clock::now();
+			std::chrono::duration<double, std::milli> elapsed_seconds = end-start;
+
+			//genero una matriz A para viajero aleatorio
+			Rala A = Rala(W.n);
+			generarMatrizDeViajeroAleatorio(W, A, p);
+
+			//multiplico la matriz por el vector resultado y guardo el nuevo resultado
+			vector<double> multiplicacionAporRes(A.n, 0);
+			multiplicacionPorVector(A, res, multiplicacionAporRes);
+
+			normalizarDiferenciaVectores(res, multiplicacionAporRes);
+			// ahora en cada elemento de res tengo el error relativo de ese res_i, 
+
+			double errorTot = 0;
+			for(int i = 0; i < res.size(); i++){
+				errorTot += pow(res[i],2);
+			}
+
+			errorTot = sqrt(errorTot);
+
+			// errorTot es la norma 2 de (multiplicacionAporRes - res) == |Ax - x|
+
+			sal << errorTot;
+			sal << ",";
+			sal << elapsed_seconds.count() << endl;
+		}
+	}
+	sal.close();
+}
+
+// fijo n = 1000 y densidad también fijada, y voy variando p desde 0.1 a 0.9 para descubrir
+// si varía el error relativo según p
+void testCambiaPrecisionSegunP(){
+	srand(600); 	// semilla 600 porque pinta
+	fstream sal("test_cambiaPrecisionSegunP.csv", ios::out);
+	double densidad = 5; // densidad matrices
+	double p = 0.1;
+
+	sal << "n,normaAxMenosX,TiempoPR,p" << endl;
+
+	for(int i = 1000; i < 1001; i = i++){
+		cout << "voy por p: ";
+		cout << p << endl;
+		for(int j = 0; j < 10; j++){
+			int n = i;
+			sal << n;
+			sal << ",";
+			Rala W = Rala(n);
+			generarMatrizConectividad(&W, densidad);
+			vector<double> res(n, 0);
+
+			// resuelvo pageRank y tomo el tiempo
+			std::chrono::time_point<std::chrono::system_clock> start, end;
+			start = std::chrono::system_clock::now();
+			resolverPageRank(W, res, p);
+			end = std::chrono::system_clock::now();
+			std::chrono::duration<double, std::milli> elapsed_seconds = end-start;
+
+			//genero una matriz A para viajero aleatorio
+			Rala A = Rala(W.n);
+			generarMatrizDeViajeroAleatorio(W, A, p);
+
+			//multiplico la matriz por el vector resultado y guardo el nuevo resultado
+			vector<double> multiplicacionAporRes(A.n, 0);
+			multiplicacionPorVector(A, res, multiplicacionAporRes);
+
+			normalizarDiferenciaVectores(res, multiplicacionAporRes);
+			// ahora en cada elemento de res tengo el error relativo de ese res_i, 
+
+			double errorTot = 0;
+			for(int i = 0; i < res.size(); i++){
+				errorTot += pow(res[i],2);
+			}
+
+			errorTot = sqrt(errorTot);
+
+			// errorTot es la norma 2 de (multiplicacionAporRes - res) == |Ax - x|
+
+			sal << errorTot;
+			sal << ",";
+			sal << elapsed_seconds.count();
+			sal << ",";
+			sal << p << endl;
+		}
+		p = p + 0.1;
+	}
+	sal.close();
+}
 
 int main(){
-	srand(time(NULL));
+	srand(time(NULL)); // COMENTAR ESTO PARA CORRER MI TEST
 	// Test1ParaSuma();
 	// Test1ParaMult();
 	// Test1ParaMultPorEsc();
@@ -881,6 +1008,8 @@ int main(){
 	// TestTrivialCatedra();
 
 	// testComparadorDeResultados();
+	// testNormaAxMenosX();
+	// testCambiaPrecisionSegunP();
 
 	return 0;
 }

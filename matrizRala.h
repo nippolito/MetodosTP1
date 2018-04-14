@@ -300,12 +300,12 @@ void reduceRowFromPivotFix(map<int,double>& row, map<int,double>& pivot, int fil
 				itAux ++;
 				if(fabs((itRow -> second) - coeficiente * (itPivot -> second)) > DBL_EPSILON){
 					// si los elems son distintos
-					noentra++;
+					// noentra++;
 					itRow -> second = (itRow -> second) - coeficiente * (itPivot -> second );
 
 				}else{
 					// si los elems son iguales
-					entra++;
+					// entra++;
 					row.erase(itRow);
 				}
 				itPivot ++;
@@ -356,10 +356,10 @@ void eliminacionGaussiana(Rala & A, vector<double> & conjunta){
 			}
 		}
 	}
-	cout << "entra: ";
-	cout << entra << endl;
-	cout << "noentra: ";
-	cout << noentra << endl;
+	// cout << "entra: ";
+	// cout << entra << endl;
+	// cout << "noentra: ";
+	// cout << noentra << endl;
 }
 
 // NO TIENE QUE TENER CEROS EN LA DIAGONAL
