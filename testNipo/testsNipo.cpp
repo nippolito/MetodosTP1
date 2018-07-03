@@ -624,6 +624,24 @@ void testTiemposSegunN(){
 
 //----------------NUEVOS TESTS PARA REENTREGA-----------------
 
+// retorna elemento máximo del vector<double>
+double maxElemVec(vector<double> vec){
+	double maxPos = 0;
+	for(int i = 1; i < vec.size(); i++){
+		if(vec[i] > vec[maxPos]) maxPos = i;
+	}
+	return vec[maxPos];
+}
+
+// retorna elemento mínimo del vector<double>
+double minElemVec(vector<double> vec){
+	double minPos = 0;
+	for(int i = 1; i < vec.size(); i++){
+		if(vec[i] < vec[minPos]) minPos = i;
+	}
+	return vec[minPos];
+}
+
 void variaPGrafoAleatorio(int n){
 	double p = 0.95;
 
@@ -658,6 +676,10 @@ void variaPGrafoAleatorio(int n){
 }
 
 void variaPGrafoEstrella(int n){
+	fstream sal("out/estrella/maxmin_n" + to_string(n) + ".csv", ios::out);
+
+	sal << "p,max,min" << endl;
+
 	double p = 0.95;
 
 	Rala W1 = Rala(n);
@@ -668,14 +690,140 @@ void variaPGrafoEstrella(int n){
 
 		resolverPageRank(W1, res1, p);
 
-		string fileName1 = "out/estrella/p" + to_string((int) (p * 101)) + ".csv"; 
+		sal << p << "," << maxElemVec(res1) << "," << minElemVec(res1) << endl;
 
-		crearCSV(res1, fileName1);
+		// string fileName1 = "out/estrella/p" + to_string((int) (p * 101)) + ".csv"; 
+
+		// crearCSV(res1, fileName1);
 
 		p = p - 0.05;
 	}
 }
 
+void variaPGrafoDienteDeLeon(int n){
+	fstream sal("out/diente_leon/maxmin_n" + to_string(n) + ".csv", ios::out);
+
+	sal << "p,max,min" << endl;
+
+	double p = 0.95;
+
+	Rala W1 = Rala(n);
+	generarGrafoDienteDeLeon(W1);
+
+	for(int i = 0; i < 19; i++){
+		vector<double> res1(n, 0);
+
+		resolverPageRank(W1, res1, p);
+
+		sal << p << "," << maxElemVec(res1) << "," << minElemVec(res1) << endl;
+
+		// string fileName1 = "out/estrella/p" + to_string((int) (p * 101)) + ".csv"; 
+
+		// crearCSV(res1, fileName1);
+
+		p = p - 0.05;
+	}
+}
+
+void variaPGrafoRetro1(int n){
+	fstream sal("out/retro_1/maxmin_n" + to_string(n) + ".csv", ios::out);
+
+	sal << "p,max,min" << endl;
+
+	double p = 0.95;
+
+	Rala W1 = Rala(n);
+	generarGrafoRetro1(W1);
+
+	for(int i = 0; i < 19; i++){
+		vector<double> res1(n, 0);
+
+		resolverPageRank(W1, res1, p);
+
+		sal << p << "," << maxElemVec(res1) << "," << minElemVec(res1) << endl;
+
+		// string fileName1 = "out/estrella/p" + to_string((int) (p * 101)) + ".csv"; 
+
+		// crearCSV(res1, fileName1);
+
+		p = p - 0.05;
+	}
+}
+
+void variaPGrafoRetro2(int n){
+	fstream sal("out/retro_2/maxmin_n" + to_string(n) + ".csv", ios::out);
+
+	sal << "p,max,min" << endl;
+
+	double p = 0.95;
+
+	Rala W1 = Rala(n);
+	generarGrafoRetro2(W1);
+
+	for(int i = 0; i < 19; i++){
+		vector<double> res1(n, 0);
+
+		resolverPageRank(W1, res1, p);
+
+		sal << p << "," << maxElemVec(res1) << "," << minElemVec(res1) << endl;
+
+		// string fileName1 = "out/estrella/p" + to_string((int) (p * 101)) + ".csv"; 
+
+		// crearCSV(res1, fileName1);
+
+		p = p - 0.05;
+	}
+}
+
+void variaPGrafoPiramide(int n){
+	fstream sal("out/piramide/maxmin_n" + to_string(n) + ".csv", ios::out);
+
+	sal << "p,max,min" << endl;
+
+	double p = 0.95;
+
+	Rala W1 = Rala(n);
+	generarGrafoPiramide(W1);
+
+	for(int i = 0; i < 19; i++){
+		vector<double> res1(n, 0);
+
+		resolverPageRank(W1, res1, p);
+
+		sal << p << "," << maxElemVec(res1) << "," << minElemVec(res1) << endl;
+
+		// string fileName1 = "out/estrella/p" + to_string((int) (p * 101)) + ".csv"; 
+
+		// crearCSV(res1, fileName1);
+
+		p = p - 0.05;
+	}
+}
+
+void variaPGrafoSimetrico(int n){
+	fstream sal("out/simetrico/maxmin_n" + to_string(n) + ".csv", ios::out);
+
+	sal << "p,max,min" << endl;
+
+	double p = 0.95;
+
+	Rala W1 = Rala(n);
+	generarGrafoSimetrico(W1);
+
+	for(int i = 0; i < 19; i++){
+		vector<double> res1(n, 0);
+
+		resolverPageRank(W1, res1, p);
+
+		sal << p << "," << maxElemVec(res1) << "," << minElemVec(res1) << endl;
+
+		// string fileName1 = "out/estrella/p" + to_string((int) (p * 101)) + ".csv"; 
+
+		// crearCSV(res1, fileName1);
+
+		p = p - 0.05;
+	}
+}
 
 
 int main(){
@@ -700,7 +848,29 @@ int main(){
 	// mostrarRala(W);
 
 	// variaPGrafoAleatorio(10);
-	variaPGrafoEstrella(10);
-
+	// variaPGrafoEstrella(10);
+	// variaPGrafoEstrella(50);
+	// variaPGrafoEstrella(100);
+	// variaPGrafoDienteDeLeon(10);
+	// variaPGrafoDienteDeLeon(50);
+	// variaPGrafoDienteDeLeon(100);
+	// variaPGrafoRetro1(10);
+	// variaPGrafoRetro1(50);
+	// variaPGrafoRetro1(100);
+	// variaPGrafoRetro2(10);
+	// variaPGrafoRetro2(50);
+	// variaPGrafoRetro2(100);
+	// variaPGrafoPiramide(10);
+	// variaPGrafoPiramide(50);
+	// variaPGrafoPiramide(100);
+	// variaPGrafoSimetrico(10);
+	// variaPGrafoSimetrico(50);
+	// variaPGrafoSimetrico(100);
+	variaPGrafoDienteDeLeon(500);
+	variaPGrafoEstrella(500);
+	variaPGrafoRetro1(500);
+	variaPGrafoRetro2(500);
+	variaPGrafoPiramide(500);
+	variaPGrafoSimetrico(500);
 	return 0;
 }
