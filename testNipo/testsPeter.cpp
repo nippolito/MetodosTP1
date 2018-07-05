@@ -677,8 +677,7 @@ void variaPGrafoEstrella(int n){
 }
 
 void pruebaMaxMinVariandoPDensidadBaja(int n, int cantIteraciones){
-	double p = 1;
-
+	
 	vector<double> promedioMaximosPorCadaPDBaja(20, 0);
 
 	vector<double> promedioMaximosPorCadaPDMedia(20, 0);
@@ -691,7 +690,7 @@ void pruebaMaxMinVariandoPDensidadBaja(int n, int cantIteraciones){
 
 	vector<double> promedioMinimosPorCadaPDAlta(20, 0);
 
-	for(int j = 0; j < 1; j++){
+	for(int j = 0; j < cantIteraciones; j++){
 		Rala W1 = Rala(n);
 		Rala W2 = Rala(n);
 		Rala W3 = Rala(n);
@@ -703,7 +702,9 @@ void pruebaMaxMinVariandoPDensidadBaja(int n, int cantIteraciones){
 		generarMatrizConectividad(&W2, 5);
 		generarMatrizConectividad(&W3, 2);
 
-		for(int i = 0; i < 20; i++){
+		for(int i = 1; i < 20; i++){
+
+			double p = i * 0.05;
 
 			cout << "Voy por p " << i * 0.05 << endl;
 			vector<double> resAlta(n, 0);
@@ -738,7 +739,7 @@ void pruebaMaxMinVariandoPDensidadBaja(int n, int cantIteraciones){
 					minMedio = resMedia[k];
 
 				if(resBaja[k] < 0)
-					//cout << resBaja[k] << endl;
+					cout << resBaja[k] << endl;
 
 				if (resBaja[k] > maxBaja)
 					maxBaja = resBaja[k];
@@ -758,7 +759,6 @@ void pruebaMaxMinVariandoPDensidadBaja(int n, int cantIteraciones){
 			promedioMaximosPorCadaPDAlta[i] += maxAlto;
 			promedioMinimosPorCadaPDAlta[i] += minAlto;
 
-			p = p + 0.05;
 		}	
 	}
 
@@ -828,7 +828,7 @@ int main(){
 	// generarGrafoPiramide(W);	
 	// mostrarRala(W);
 
-	pruebaMaxMinVariandoPDensidadBaja(10, 100);
+	pruebaMaxMinVariandoPDensidadBaja(100, 100);
 
 	// variaPGrafoAleatorio(10);
 	//variaPGrafoEstrella(10);
